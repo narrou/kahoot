@@ -14,9 +14,9 @@ import java.util.*;
 public class KahootRequete {
     private static Scanner scanner = new Scanner(System.in);
     private static Connection connect;
-    private static String url = "jdbc:mysql://localhost:3306/kahoot3?zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=UTC";
-    private static String user = "admin";
-    private static String mdp = "Marie0212";
+    private static String url = "jdbc:mysql://localhost:3306/kahoot?zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=UTC";
+    private static String user = "root";
+    private static String mdp = "";
 
     public KahootRequete() throws SQLException {
         connect = DriverManager.getConnection(url, user, mdp);
@@ -114,6 +114,21 @@ public class KahootRequete {
         }
         return leJoueur;
     }
+    public Joueur getJoueur(String log , String mdp ) throws SQLException {
+        Joueur leJoueur = null;
+        String requete = "SELECT * FROM JOUEUR WHERE login = ? AND mdp = ? ";
+        if (getNbJoueurs() > 0) {
+            PreparedStatement pstnt = connect.prepareStatement(requete);
+            pstnt.setString(1, log);
+            pstnt.setString(2, mdp);
+            ResultSet res = pstnt.executeQuery();
+            while (res.next()) {
+                leJoueur = new Joueur(res.getString("login"), res.getString("mdp"),res.getInt("idJOUEUR"));
+            }
+        }
+        return leJoueur;
+    }
+
 
     public int addjoueur(Joueur joueur) throws SQLException {
         String requete = "INSERT INTO JOUEUR(login,mdp) VALUES ('" + joueur.getLogin() + "','" + joueur.getMdp() + "')";
@@ -205,6 +220,62 @@ public class KahootRequete {
             return false;
         }
         return true;
+    }
+
+    public void remplirBdd(String fic) {
+
+        JSONParser parser = new JSONParser();
+
+        try {
+            KahootRequete maRequete = new KahootRequete();
+
+            try {
+                JSONObject jsonObject = (JSONObject) parser.parse(new FileReader(fic));
+                Categorie theme = new Categorie((String) jsonObject.get("thème"));
+                int idCat = maRequete.addCategorie(theme);
+                theme.setIdCat(idCat);
+                JSONArray tableauFrDeb = (JSONArray) ((JSONObject) ((JSONObject) jsonObject.get("quizz")).get("fr")).get("expert");
+                Iterator iteratorQuestion = tableauFrDeb.iterator();
+                while (iteratorQuestion.hasNext()) {
+
+                    JSONObject blocQuestion = (JSONObject) iteratorQuestion.next();
+                    String question = (String) blocQuestion.get("question");
+                    String stringBonneReponse = (String) blocQuestion.get("réponse");
+                    Reponse bonneReponse = new Reponse(1, stringBonneReponse);
+                    JSONArray tableauDeProp = (JSONArray) blocQuestion.get("propositions");
+                    List<Reponse> propositions = new ArrayList<>();
+                    int compteur = 1;
+                    for (Object props : tableauDeProp) {
+                        String proposition = (String) props;
+                        if (proposition.equals(stringBonneReponse)) {
+                            bonneReponse.setNoOption(compteur);
+                            propositions.add(bonneReponse);
+                            int idrep = maRequete.addReponse(bonneReponse);
+                        } else {
+                            Reponse a =new Reponse(compteur, proposition);
+                            int idRep= maRequete.addReponse(a);
+                            a.setNoOption(idRep);
+                            propositions.add(a);
+                        }
+                        compteur++;
+                    }
+
+                    Long indexLong = (Long) blocQuestion.get("id");
+                    int index = indexLong.intValue();
+                    Question q = new Question(index,question, theme, propositions, bonneReponse);
+                    int idquestion = maRequete.addQuestion(q, bonneReponse);
+                    boolean prop = maRequete.addPropositions(q);
+
+
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return;
+        } catch (SQLException throwables) {
+            //    throwables.printStackTrace();
+        }
     }
 
 }

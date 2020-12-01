@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="client.menuForm">
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="client.MenuForm">
   <grid id="cbd77" binding="contentPane" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="10" left="10" bottom="10" right="10"/>
     <constraints>
@@ -24,23 +24,13 @@
             </constraints>
             <properties/>
           </component>
-          <component id="7b472" class="javax.swing.JTextField" binding="textField3" default-binding="true">
+          <component id="7b472" class="javax.swing.JTextField" binding="JSONfield">
             <constraints>
               <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <preferred-size width="150" height="-1"/>
               </grid>
             </constraints>
             <properties/>
-          </component>
-          <component id="a700f" class="javax.swing.JTextField" binding="pseudoTextField" default-binding="true">
-            <constraints>
-              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
-                <preferred-size width="150" height="-1"/>
-              </grid>
-            </constraints>
-            <properties>
-              <text value="Pseudo"/>
-            </properties>
           </component>
           <component id="ea836" class="javax.swing.JComboBox" binding="comboBox1" default-binding="true">
             <constraints>
@@ -56,12 +46,12 @@
               <text value="Rejoindre partie"/>
             </properties>
           </component>
-          <component id="8f2be" class="javax.swing.JButton" binding="créerPartieButton" default-binding="true">
+          <component id="8f2be" class="javax.swing.JButton" binding="creerPartieButton">
             <constraints>
               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Créer partie"/>
+              <text value="Creer partie"/>
             </properties>
           </component>
           <component id="35cc7" class="javax.swing.JButton" binding="ajouterJSONButton" default-binding="true">
@@ -72,12 +62,12 @@
               <text value="Ajouter JSON"/>
             </properties>
           </component>
-          <component id="5827a" class="javax.swing.JLabel">
+          <component id="860ec" class="javax.swing.JLabel" binding="pseudo">
             <constraints>
-              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="0" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Pseudo"/>
+              <text value="Label"/>
             </properties>
           </component>
         </children>

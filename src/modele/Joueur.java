@@ -2,10 +2,16 @@ package modele;
 public class Joueur {
     private String  login;
     private String mdp;
-
+    private int id;
     public Joueur(String login, String mdp) {
         this.login = login;
         this.mdp = mdp;
+    }
+
+    public Joueur(String login, String mdp, int id) {
+        this.login = login;
+        this.mdp = mdp;
+        this.id = id;
     }
 
     @Override
