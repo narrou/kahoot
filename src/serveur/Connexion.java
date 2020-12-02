@@ -10,13 +10,12 @@ public class Connexion extends Thread{
     private ObjectOutputStream out;
     private Serveur serv;
 
-    public Connexion(Socket socket, Serveur s) {
+    public Connexion(Socket socket) {
         try {
             this.socket = socket;
-            this.serv = s;
-            System.out.println("creer");
-            this.out = new ObjectOutputStream(this.socket.getOutputStream());
-            this.in = new ObjectInputStream(this.socket.getInputStream());
+           // this.serv = s; TODO PLEURER
+           this.out = new ObjectOutputStream(this.socket.getOutputStream());
+  //          this.in = new ObjectInputStream(this.socket.getInputStream());
 
             System.out.println("Fin création connexion");
         } catch (IOException e) {

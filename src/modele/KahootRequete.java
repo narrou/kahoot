@@ -8,13 +8,14 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.sql.*;
 import java.util.*;
 
 public class KahootRequete {
     private static Scanner scanner = new Scanner(System.in);
     private static Connection connect;
-    private static String url = "jdbc:mysql://localhost:3306/kahoot?zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=UTC";
+    private static String url = "jdbc:mysql://localhost:3306/kahoot3?zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=UTC";
     private static String user = "root";
     private static String mdp = "";
 
@@ -128,6 +129,15 @@ public class KahootRequete {
         }
         return leJoueur;
     }
+    public ResultSet getPartie(String code) throws SQLException {
+        String requete = "SELECT * FROM partie WHERE code LIKE ?";
+
+        PreparedStatement pstnt = connect.prepareStatement(requete);
+        pstnt.setString(1, code);
+        ResultSet res = pstnt.executeQuery();
+        return res;
+    }
+
 
 
     public int addjoueur(Joueur joueur) throws SQLException {
@@ -221,6 +231,42 @@ public class KahootRequete {
         }
         return true;
     }
+
+    public Partie addPartie(Joueur Host,int port) throws SQLException {
+
+            int leftLimit = 65; // letter 'A'
+            int rightLimit = 90; // letter 'Z'
+            int targetStringLength = 5;
+            Random random = new Random();
+
+            String generatedString = random.ints(leftLimit, rightLimit + 1)
+                    .limit(targetStringLength)
+                    .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                    .toString();
+
+        String requete = "INSERT INTO partie (ID_HOTE,code,port) VALUES (?,?,?);";
+        PreparedStatement pstnt = connect.prepareStatement(requete,Statement.RETURN_GENERATED_KEYS);
+        pstnt.setInt(1, Host.getId());
+        pstnt.setString(2, generatedString);
+        pstnt.setInt(3, port);
+        pstnt.executeUpdate();
+        ResultSet res = pstnt.getGeneratedKeys();
+        int id = 0;
+        if (res.next()) {
+            id = res.getInt(1);
+        }
+            return new Partie(id,generatedString,port) ;
+    }
+public void addJoueurPartie(int idpartie, int idjoueur)throws SQLException{
+    String requete = "INSERT INTO joueur_partie (ID_PARTIE,idJOUEUR,SCORE) VALUES (?,?,0);";
+    PreparedStatement pstnt = connect.prepareStatement(requete);
+    pstnt.setInt(1,idpartie) ;
+    pstnt.setInt(2, idjoueur);
+    pstnt.executeUpdate();
+
+}
+
+
 
     public void remplirBdd(String fic) {
 

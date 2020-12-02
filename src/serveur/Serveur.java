@@ -10,10 +10,11 @@ import java.util.List;
 public class Serveur extends Thread{
     private ServerSocket socEcoute;
     private List<Connexion> connexions = new ArrayList<>();
+    private int port;
 
-    public Serveur() {
+    public Serveur(int port) {
         try {
-            this.socEcoute = new ServerSocket(49513);
+            this.socEcoute = new ServerSocket(port);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -33,14 +34,13 @@ public class Serveur extends Thread{
             e.printStackTrace();
         }
     }
-
     public void run(){
         try {
             do {
                 System.out.println("En attente de connexion");
                 Socket co = this.socEcoute.accept();
                 System.out.println("Connexion acceptée");
-                connexions.add(new Connexion(co, this));
+                connexions.add(new Connexion(co));
                 System.out.println("Connexion démarrée");
                 connexions.get(connexions.size()-1).start();
                 System.out.println(connexions.size());
@@ -53,18 +53,4 @@ public class Serveur extends Thread{
         }
     }
 
-
-
-    public static void main(String[] args) {
-        try {
-            Serveur serv = new Serveur();
-            serv.start();
-            for (int i = 0; i < 5; i++) {
-                Socket soc = new Socket(InetAddress.getLocalHost(), 49513);
-            }
-        }catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
 }

@@ -1,21 +1,29 @@
 package client;
 import modele.*;
+import serveur.Connexion;
+import serveur.Serveur;
 
 //TODO GERER LES SQL EXECPTION
 
 
 import javax.swing.*;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ApplicationClient extends JFrame {
+    static int IDPORT=49513;
     LoginForm log ;
     MenuForm menu;
     AttenteForm attente;
     KahootRequete provider ;
     List<Categorie> categorieList =new ArrayList<>();
-    Joueur coJoueur = null;
+    Joueur joueur = null;
+    Partie maPartie ;
     public ApplicationClient(){
         try {
             provider= new KahootRequete();
@@ -58,25 +66,25 @@ public class ApplicationClient extends JFrame {
                     log.getInfoLabel().setText(throwables.getMessage());
                     this.pack();
                 }
-                coJoueur = newJoueur;
+                joueur = newJoueur;
 
             case "Connection":
-                if (coJoueur == null) {
+                if (joueur == null) {
                     if (log.getLogin().getText().isEmpty() || log.getMdp().getText().isEmpty()) {
                         log.getInfoLabel().setText("completer les deux champs");
                         this.pack();
                         break;
                     }
                     try {
-                        coJoueur = provider.getJoueur(log.getLogin().getText(), log.getMdp().getText());
+                        joueur = provider.getJoueur(log.getLogin().getText(), log.getMdp().getText());
                     } catch (SQLException throwables) {
                         log.getInfoLabel().setText(throwables.getMessage());
                         this.pack();
                     }
                 }
             case "Retour" :
-                //TODO CLOSE LE PARTIE / SERV
-                menu.getPseudo().setText(coJoueur.getLogin());
+                //TODO CLOSE LA PARTIE / SERV
+                menu.getPseudo().setText(joueur.getLogin());
                 updatecombobox(categorieList);
                 setContentPane(menu.getContentPane());
                 this.revalidate();
@@ -93,17 +101,50 @@ public class ApplicationClient extends JFrame {
 
             case "Creer partie":
                 //TODO LANCER LE SERV ET TOUTE LA MIFA
+                System.out.println("la");
+                Serveur serv= new Serveur(IDPORT);
+                try {
+                    Connexion c1 = new Connexion(new Socket(InetAddress.getLocalHost(), IDPORT));
+                    maPartie= provider.addPartie(joueur,IDPORT);
+                    provider.addJoueurPartie(joueur.getId(),maPartie.getIdPartie());
+                } catch (IOException | SQLException e) {
+                    e.printStackTrace();
+                }
+                IDPORT++;
                 attente.getCatname().setText(menu.getComboBoxCat().getSelectedItem().toString());
+
+
                 setContentPane(attente.getContentPane());
                 this.revalidate();
                 this.pack();
                 break;
             case "Rejoindre partie":
                 //TODO
-                break;
+                String codejoin = menu.getJoinCode().getText();
+                try {
+                    ResultSet res = provider.getPartie(codejoin);
+                    if (!res.isBeforeFirst() ) {
+                       break;
+                    }
+                    res.next();
+                    maPartie= new Partie(res.getInt("ID_PARTIE"),res.getString("code"),res.getInt("port"));
+                    provider.addJoueurPartie(joueur.getId(),maPartie.getIdPartie());
+                    try {
+                        Connexion c1 = new Connexion(new Socket(InetAddress.getLocalHost(),maPartie.getPort()));
+                        setContentPane(attente.getContentPane());
+                        this.revalidate();
+                        this.pack();
+                        break;
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
 
             case  "Logout" :
-                coJoueur=null;
+                joueur =null;
                 log.getInfoLabel().setText("");
                 log.getLogin().setText("");
                 log.getMdp().setText("");
@@ -119,10 +160,7 @@ public class ApplicationClient extends JFrame {
 
         }
 
-
-
     public static void main(String[] args) {
-
         ApplicationClient f = new ApplicationClient();
         f.setVisible(true);
         f.pack();

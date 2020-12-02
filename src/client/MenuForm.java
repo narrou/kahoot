@@ -6,7 +6,7 @@ import java.awt.event.ActionListener;
 
 public class MenuForm extends JPanel {
     private JPanel contentPane;
-    private JTextField textField2;
+    private JTextField joinCode;
     private JTextField JSONfield;
     private JComboBox ComboBoxCat;
     private JButton rejoindrePartieButton;
@@ -15,6 +15,10 @@ public class MenuForm extends JPanel {
     private JLabel pseudo;
     private JButton logoutButton;
     private ApplicationClient app ;
+
+    public JTextField getJoinCode() {
+        return joinCode;
+    }
 
     public JLabel getPseudo() {
         return pseudo;
