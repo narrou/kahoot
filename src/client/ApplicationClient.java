@@ -1,9 +1,10 @@
 package client;
 import modele.*;
 
+//TODO GERER LES SQL EXECPTION
+
+
 import javax.swing.*;
-import java.awt.*;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +44,7 @@ public class ApplicationClient extends JFrame {
         System.out.println(actionCommand);
 
         switch (actionCommand) {
+
             case "S'inscrire":
                 if (log.getLogininsc().getText().isEmpty() || log.getMdpinsc().getText().isEmpty()) {
                     log.getInfoLabel().setText("completer les deux champs");
@@ -53,13 +55,12 @@ public class ApplicationClient extends JFrame {
                 try {
                     provider.addjoueur(newJoueur);
                 } catch (SQLException throwables) {
-                    System.out.println("cc");
                     log.getInfoLabel().setText(throwables.getMessage());
                     this.pack();
                 }
                 coJoueur = newJoueur;
-            case "Connection":
 
+            case "Connection":
                 if (coJoueur == null) {
                     if (log.getLogin().getText().isEmpty() || log.getMdp().getText().isEmpty()) {
                         log.getInfoLabel().setText("completer les deux champs");
@@ -74,12 +75,14 @@ public class ApplicationClient extends JFrame {
                     }
                 }
             case "Retour" :
+                //TODO CLOSE LE PARTIE / SERV
                 menu.getPseudo().setText(coJoueur.getLogin());
                 updatecombobox(categorieList);
                 setContentPane(menu.getContentPane());
                 this.revalidate();
                 this.pack();
                 break;
+
             case "Ajouter JSON":
                 provider.remplirBdd(menu.getJSONfield().getText());
                 menu.getJSONfield().setText("");
@@ -89,13 +92,14 @@ public class ApplicationClient extends JFrame {
                 break;
 
             case "Creer partie":
+                //TODO LANCER LE SERV ET TOUTE LA MIFA
                 attente.getCatname().setText(menu.getComboBoxCat().getSelectedItem().toString());
                 setContentPane(attente.getContentPane());
                 this.revalidate();
                 this.pack();
                 break;
             case "Rejoindre partie":
-
+                //TODO
                 break;
 
             case  "Logout" :
