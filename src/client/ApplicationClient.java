@@ -2,13 +2,17 @@ package client;
 import modele.*;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ApplicationClient extends JFrame {
     LoginForm log ;
     MenuForm menu;
     KahootRequete provider ;
+    List<Categorie> categorieList =new ArrayList<>();
     public ApplicationClient(){
         try {
             provider= new KahootRequete();
@@ -19,44 +23,54 @@ public class ApplicationClient extends JFrame {
         menu = new MenuForm(this);
         setContentPane(log.getContentPane());
     }
-
+public void updatecombobox(List<Categorie> categorieList){
+        menu.getComboBoxCat().removeAllItems();
+    try {
+        categorieList = provider.getCategories();
+    } catch (SQLException throwables) {
+        throwables.printStackTrace();
+    }
+    for (Categorie cat: categorieList) {
+        menu.getComboBoxCat().addItem(cat.getCategorie());
+    }
+}
     public void way(String actionCommand){
         Joueur coJoueur = null;
         System.out.println(actionCommand);
 
         switch (actionCommand) {
-            case "S'inscrire" :
-                if(log.getLogininsc().getText().isEmpty() || log.getMdpinsc().getText().isEmpty()){
+            case "S'inscrire":
+                if (log.getLogininsc().getText().isEmpty() || log.getMdpinsc().getText().isEmpty()) {
                     log.getInfoLabel().setText("completer les deux champs");
                     this.pack();
                     break;
                 }
-                    Joueur newJoueur = new Joueur(log.getLogininsc().getText(),log.getMdpinsc().getText());
+                Joueur newJoueur = new Joueur(log.getLogininsc().getText(), log.getMdpinsc().getText());
                 try {
                     provider.addjoueur(newJoueur);
                 } catch (SQLException throwables) {
                     System.out.println("cc");
-                    log.getInfoLabel().setText( throwables.getMessage());
+                    log.getInfoLabel().setText(throwables.getMessage());
                     this.pack();
                 }
-                coJoueur=newJoueur;
-            case "Connection" :
+                coJoueur = newJoueur;
+            case "Connection":
 
-                    if(coJoueur==null) {
-                        if(log.getLogin().getText().isEmpty() || log.getMdp().getText().isEmpty()){
-                            log.getInfoLabel().setText("completer les deux champs");
-                            this.pack();
-                            break;
-                        }
-                        try {
-                            coJoueur= provider.getJoueur(log.getLogin().getText(),log.getMdp().getText());
-                        } catch (SQLException throwables ) {
-                            log.getInfoLabel().setText(throwables.getMessage());
-                            this.pack();
-                        }
+                if (coJoueur == null) {
+                    if (log.getLogin().getText().isEmpty() || log.getMdp().getText().isEmpty()) {
+                        log.getInfoLabel().setText("completer les deux champs");
+                        this.pack();
+                        break;
                     }
-                    menu.getPseudo().setText(coJoueur.getLogin());
-
+                    try {
+                        coJoueur = provider.getJoueur(log.getLogin().getText(), log.getMdp().getText());
+                    } catch (SQLException throwables) {
+                        log.getInfoLabel().setText(throwables.getMessage());
+                        this.pack();
+                    }
+                }
+                menu.getPseudo().setText(coJoueur.getLogin());
+                updatecombobox(categorieList);
                 setContentPane(menu.getContentPane());
                 this.revalidate();
                 this.pack();
@@ -64,6 +78,7 @@ public class ApplicationClient extends JFrame {
             case "Ajouter JSON":
                 provider.remplirBdd(menu.getJSONfield().getText());
                 menu.getJSONfield().setText("");
+                updatecombobox(categorieList);
                 this.revalidate();
                 this.pack();
                 break;
@@ -89,6 +104,7 @@ public class ApplicationClient extends JFrame {
             default:
 
         }
+
         }
 
 

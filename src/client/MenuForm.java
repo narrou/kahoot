@@ -8,7 +8,7 @@ public class MenuForm extends JPanel {
     private JPanel contentPane;
     private JTextField textField2;
     private JTextField JSONfield;
-    private JComboBox comboBox1;
+    private JComboBox ComboBoxCat;
     private JButton rejoindrePartieButton;
     private JButton creerPartieButton;
     private JButton ajouterJSONButton;
@@ -22,6 +22,10 @@ public class MenuForm extends JPanel {
 
     public JTextField getJSONfield() {
         return JSONfield;
+    }
+
+    public JComboBox getComboBoxCat() {
+        return ComboBoxCat;
     }
 
     public  MenuForm(ApplicationClient application) {
