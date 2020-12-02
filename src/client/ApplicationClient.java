@@ -8,6 +8,8 @@ import serveur.Serveur;
 
 import javax.swing.*;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.sql.ResultSet;
@@ -23,7 +25,9 @@ public class ApplicationClient extends JFrame {
     KahootRequete provider ;
     List<Categorie> categorieList =new ArrayList<>();
     Joueur joueur = null;
-    Partie maPartie ;
+    Partie maPartie;
+    Socket s1;
+    ObjectOutputStream out;
     public ApplicationClient(){
         try {
             provider= new KahootRequete();
@@ -102,9 +106,14 @@ public class ApplicationClient extends JFrame {
             case "Creer partie":
                 //TODO LANCER LE SERV ET TOUTE LA MIFA
                 System.out.println("la");
-                Serveur serv= new Serveur(IDPORT);
+                Serveur serv= new Serveur(IDPORT, this);
+                serv.start();
                 try {
-                    Connexion c1 = new Connexion(new Socket(InetAddress.getLocalHost(), IDPORT));
+                    this.s1 = new Socket(InetAddress.getLocalHost(), IDPORT);
+                    System.out.println("pt");
+                    this.out = new ObjectOutputStream(this.s1.getOutputStream());
+                    System.out.println("rt");
+                    this.out.writeObject(joueur);
                     maPartie= provider.addPartie(joueur,IDPORT);
                     provider.addJoueurPartie(joueur.getId(),maPartie.getIdPartie());
                 } catch (IOException | SQLException e) {
@@ -130,7 +139,9 @@ public class ApplicationClient extends JFrame {
                     maPartie= new Partie(res.getInt("ID_PARTIE"),res.getString("code"),res.getInt("port"));
                     provider.addJoueurPartie(joueur.getId(),maPartie.getIdPartie());
                     try {
-                        Connexion c1 = new Connexion(new Socket(InetAddress.getLocalHost(),maPartie.getPort()));
+                        this.s1 = new Socket(InetAddress.getLocalHost(), res.getInt("port"));
+                        this.out = new ObjectOutputStream(this.s1.getOutputStream());
+                        this.out.writeObject(joueur);
                         setContentPane(attente.getContentPane());
                         this.revalidate();
                         this.pack();
@@ -160,11 +171,17 @@ public class ApplicationClient extends JFrame {
 
         }
 
+    public AttenteForm getAttente() {
+        return attente;
+    }
+
     public static void main(String[] args) {
         ApplicationClient f = new ApplicationClient();
         f.setVisible(true);
         f.pack();
-
+        ApplicationClient f1 = new ApplicationClient();
+        f1.setVisible(true);
+        f1.pack();
     }
 }
 

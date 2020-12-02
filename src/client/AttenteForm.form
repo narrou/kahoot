@@ -22,7 +22,12 @@
             </constraints>
             <properties/>
             <border type="none"/>
-            <children/>
+            <children>
+              <component id="1cd1c" class="javax.swing.JTextArea" binding="listeJoueur">
+                <constraints/>
+                <properties/>
+              </component>
+            </children>
           </scrollpane>
           <component id="f3ba3" class="javax.swing.JButton" binding="retourButton" default-binding="true">
             <constraints>

@@ -12,9 +12,9 @@ import java.util.logging.Logger;
  */
 public class KahootConnect{
     private static Connection connect;
-    private static String url="jdbc:mysql://localhost:3306/kahoot?zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=UTC";
-    private static String user="admin";
-    private static String mdp="";
+    private static String url="jdbc:mysql://localhost:3306/kahoot3?zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=UTC";
+    private static String user="root";
+    private static String mdp="Marie0212";
 
     public KahootConnect() {
         try {

@@ -16,8 +16,8 @@ public class KahootRequete {
     private static Scanner scanner = new Scanner(System.in);
     private static Connection connect;
     private static String url = "jdbc:mysql://localhost:3306/kahoot3?zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=UTC";
-    private static String user = "root";
-    private static String mdp = "";
+    private static String user = "admin";
+    private static String mdp = "Marie0212";
 
     public KahootRequete() throws SQLException {
         connect = DriverManager.getConnection(url, user, mdp);

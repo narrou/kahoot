@@ -1,21 +1,26 @@
 package serveur;
 
+import client.ApplicationClient;
+import modele.Joueur;
 import modele.Message;
 import java.io.*;
 import java.net.Socket;
 
 public class Connexion extends Thread{
     private Socket socket;
+    private Joueur joueur;
     private ObjectInputStream in;
     private ObjectOutputStream out;
-    private Serveur serv;
+    private ApplicationClient app;
 
-    public Connexion(Socket socket) {
+    public Connexion(Socket socket, Joueur joueur, ApplicationClient app) {
         try {
             this.socket = socket;
+            this.joueur = joueur;
+            this.app = app;
            // this.serv = s; TODO PLEURER
-           this.out = new ObjectOutputStream(this.socket.getOutputStream());
-  //          this.in = new ObjectInputStream(this.socket.getInputStream());
+            this.out = new ObjectOutputStream(this.socket.getOutputStream());
+            this.in = new ObjectInputStream(this.socket.getInputStream());
 
             System.out.println("Fin création connexion");
         } catch (IOException e) {
@@ -25,29 +30,23 @@ public class Connexion extends Thread{
 
     public void run(){
         try {
-            while (true){
-                Message txt = (Message) this.in.readObject();
-                if (txt != null){
-                    envoyerMessage(txt.toString());
-                }
+            while (true) {
+                String newLogin = (String) this.in.readObject();
+                app.getAttente().getListeJoueur().append(newLogin);
             }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+    }
 
+    public ObjectOutputStream getOut() {
+        return out;
     }
 
     private synchronized void envoyerMessage(String message){
-        for (Connexion co: serv.getConnexions()){
-            try {
-                co.out.writeObject(message);
-                co.out.flush();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+
     }
 
     public void fermerSocket() throws IOException {

@@ -1,5 +1,8 @@
 package modele;
-public class Joueur {
+
+import java.io.Serializable;
+
+public class Joueur implements Serializable {
     private String  login;
     private String mdp;
     private int id;
