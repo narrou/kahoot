@@ -11,6 +11,7 @@ import java.util.List;
 public class ApplicationClient extends JFrame {
     LoginForm log ;
     MenuForm menu;
+    AttenteForm attente;
     KahootRequete provider ;
     List<Categorie> categorieList =new ArrayList<>();
     public ApplicationClient(){
@@ -21,18 +22,20 @@ public class ApplicationClient extends JFrame {
         }
         log = new LoginForm(this);
         menu = new MenuForm(this);
+        attente = new AttenteForm(this);
         setContentPane(log.getContentPane());
     }
-public void updatecombobox(List<Categorie> categorieList){
-        menu.getComboBoxCat().removeAllItems();
-    try {
-        categorieList = provider.getCategories();
-    } catch (SQLException throwables) {
-        throwables.printStackTrace();
-    }
-    for (Categorie cat: categorieList) {
-        menu.getComboBoxCat().addItem(cat.getCategorie());
-    }
+
+    public void updatecombobox(List<Categorie> categorieList){
+            menu.getComboBoxCat().removeAllItems();
+        try {
+            categorieList = provider.getCategories();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        for (Categorie cat: categorieList) {
+            menu.getComboBoxCat().addItem(cat.getCategorie());
+        }
 }
     public void way(String actionCommand){
         Joueur coJoueur = null;
@@ -84,7 +87,10 @@ public void updatecombobox(List<Categorie> categorieList){
                 break;
 
             case "Creer partie":
-
+                attente.getCatname().setText(menu.getComboBoxCat().getSelectedItem().toString());
+                setContentPane(attente.getContentPane());
+                this.revalidate();
+                this.pack();
                 break;
             case "Rejoindre partie":
 

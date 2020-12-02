@@ -1,22 +1,31 @@
 package client;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-public class AttenteForm extends JDialog {
+public class AttenteForm extends JPanel {
     private JPanel contentPane;
-    private JButton quitterButton;
+    private JButton retourButton;
     private JButton readyButton;
+    private JLabel catname;
+    private ApplicationClient app ;
 
-
-    public AttenteForm() {
-        setContentPane(contentPane);
-        setModal(true);
+    public JPanel getContentPane() {
+        return contentPane;
     }
 
-    public static void main(String[] args) {
-        AttenteForm dialog = new AttenteForm();
-        dialog.pack();
-        dialog.setVisible(true);
-        System.exit(0);
+    public JLabel getCatname() {
+        return catname;
     }
+
+    public AttenteForm(ApplicationClient application) {
+        app=application;
+        readyButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                app.way(e.getActionCommand());
+            }
+        });
+    }
+
 }
