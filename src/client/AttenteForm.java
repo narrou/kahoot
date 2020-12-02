@@ -26,6 +26,11 @@ public class AttenteForm extends JPanel {
                 app.way(e.getActionCommand());
             }
         });
+        retourButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                app.way(e.getActionCommand());
+            }
+        });
     }
 
 }

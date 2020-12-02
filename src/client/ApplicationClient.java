@@ -14,6 +14,7 @@ public class ApplicationClient extends JFrame {
     AttenteForm attente;
     KahootRequete provider ;
     List<Categorie> categorieList =new ArrayList<>();
+    Joueur coJoueur = null;
     public ApplicationClient(){
         try {
             provider= new KahootRequete();
@@ -38,7 +39,7 @@ public class ApplicationClient extends JFrame {
         }
 }
     public void way(String actionCommand){
-        Joueur coJoueur = null;
+
         System.out.println(actionCommand);
 
         switch (actionCommand) {
@@ -72,6 +73,7 @@ public class ApplicationClient extends JFrame {
                         this.pack();
                     }
                 }
+            case "Retour" :
                 menu.getPseudo().setText(coJoueur.getLogin());
                 updatecombobox(categorieList);
                 setContentPane(menu.getContentPane());
