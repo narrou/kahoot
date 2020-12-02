@@ -13,6 +13,7 @@ public class MenuForm extends JPanel {
     private JButton creerPartieButton;
     private JButton ajouterJSONButton;
     private JLabel pseudo;
+    private JButton logoutButton;
     private ApplicationClient app ;
 
     public JLabel getPseudo() {
@@ -40,7 +41,13 @@ public class MenuForm extends JPanel {
                 app.way(e.getActionCommand());
             }
         });
+        logoutButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                app.way(e.getActionCommand());
+            }
+        });
         }
+
 
     public JPanel getContentPane() {
         return contentPane;

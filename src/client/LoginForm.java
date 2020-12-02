@@ -13,7 +13,12 @@ public class LoginForm extends JPanel {
     private JButton sInscrireButton;
     private JTextField login;
     private JTextField mdp;
+    private JLabel InfoLabel;
     private ApplicationClient app ;
+
+    public JLabel getInfoLabel() {
+        return InfoLabel;
+    }
 
     public JTextField getLogininsc() {
         return logininsc;

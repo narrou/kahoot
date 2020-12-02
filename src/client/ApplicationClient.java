@@ -2,6 +2,7 @@ package client;
 import modele.*;
 
 import javax.swing.*;
+import java.io.IOException;
 import java.sql.SQLException;
 
 public class ApplicationClient extends JFrame {
@@ -25,23 +26,36 @@ public class ApplicationClient extends JFrame {
 
         switch (actionCommand) {
             case "S'inscrire" :
-                Joueur newJoueur = new Joueur(log.getLogininsc().getText(),log.getMdpinsc().getText());
+                if(log.getLogininsc().getText().isEmpty() || log.getMdpinsc().getText().isEmpty()){
+                    log.getInfoLabel().setText("completer les deux champs");
+                    this.pack();
+                    break;
+                }
+                    Joueur newJoueur = new Joueur(log.getLogininsc().getText(),log.getMdpinsc().getText());
                 try {
                     provider.addjoueur(newJoueur);
                 } catch (SQLException throwables) {
-                    throwables.printStackTrace();
+                    System.out.println("cc");
+                    log.getInfoLabel().setText( throwables.getMessage());
+                    this.pack();
                 }
                 coJoueur=newJoueur;
             case "Connection" :
-                // menu = new MenuForm(this);
-                try {
-                    if(coJoueur==null)
-                        coJoueur= provider.getJoueur(log.getLogin().getText(),log.getMdp().getText());
-                        menu.getPseudo().setText(coJoueur.getLogin());
-                        System.out.println(coJoueur.toString());
-                } catch (SQLException throwables) {
-                    throwables.printStackTrace();
-                }
+
+                    if(coJoueur==null) {
+                        if(log.getLogin().getText().isEmpty() || log.getMdp().getText().isEmpty()){
+                            log.getInfoLabel().setText("completer les deux champs");
+                            this.pack();
+                            break;
+                        }
+                        try {
+                            coJoueur= provider.getJoueur(log.getLogin().getText(),log.getMdp().getText());
+                        } catch (SQLException throwables ) {
+                            log.getInfoLabel().setText(throwables.getMessage());
+                            this.pack();
+                        }
+                    }
+                    menu.getPseudo().setText(coJoueur.getLogin());
 
                 setContentPane(menu.getContentPane());
                 this.revalidate();
@@ -61,7 +75,17 @@ public class ApplicationClient extends JFrame {
 
                 break;
 
-
+            case  "Logout" :
+                coJoueur=null;
+                log.getInfoLabel().setText("");
+                log.getLogin().setText("");
+                log.getMdp().setText("");
+                log.getLogininsc().setText("");
+                log.getMdpinsc().setText("");
+                setContentPane(log.getContentPane());
+                this.revalidate();
+                this.pack();
+                break;
             default:
 
         }
