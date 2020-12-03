@@ -2,6 +2,8 @@ package serveur;
 
 import client.ApplicationClient;
 import modele.Joueur;
+import modele.ListeJoueur;
+import modele.Question;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -15,6 +17,7 @@ import java.util.List;
 public class Serveur extends Thread{
     private ServerSocket socEcoute;
     private List<Connexion> connexions = new ArrayList<>();
+    private ListeJoueur listJoueurs = new ListeJoueur();
     private int port;
     private ApplicationClient app;
 
@@ -42,15 +45,44 @@ public class Serveur extends Thread{
         }
     }
 
-    private void envoyerMessages(Joueur j){
+    private void envoyerMessages(){
         for (Connexion c : connexions){
             try {
-                c.getOut().writeObject(j.getLogin());
+                ObjectOutputStream oos = c.getOut();
+                oos.reset();
+                oos.writeObject("NotReady");
+                oos.writeObject(listJoueurs);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
+
+    public void isReady(){
+        for (Connexion c : connexions){
+            try {
+                ObjectOutputStream oos = c.getOut();
+                oos.reset();
+                oos.writeObject("Ready");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void envoyerQuestion(Question q){
+        for (Connexion c : connexions){
+            try {
+                ObjectOutputStream oos = c.getOut();
+                oos.reset();
+                oos.writeObject(q);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
 
 
     public void run(){
@@ -59,16 +91,15 @@ public class Serveur extends Thread{
                 System.out.println("En attente de connexion");
                 Socket co = this.socEcoute.accept();
                 System.out.println("Connexion acceptée");
-                ObjectInputStream ois = new ObjectInputStream(co.getInputStream());
                 ObjectOutputStream oos = new ObjectOutputStream(co.getOutputStream());
+                ObjectInputStream ois = new ObjectInputStream(co.getInputStream());
                 Joueur j = (Joueur) ois.readObject();
-                System.out.println(j.getLogin());
-                Connexion c = new Connexion(co, j, this.app);
+                Connexion c = new Connexion(co, oos, ois,j, this.app);
+                listJoueurs.add(j);
                 connexions.add(c);
                 connexions.get(connexions.size()-1).start();
-                envoyerMessages(j);
+                envoyerMessages();
                 System.out.println("Connexion démarrée");
-
                 System.out.println(connexions.size());
             }while (true);
         } catch (IOException | ClassNotFoundException e) {

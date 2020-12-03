@@ -1,8 +1,11 @@
 package modele;
+import serveur.Serveur;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Question extends Option{
+public class Question extends Option implements Serializable {
     private Categorie categorie ;
     private List<Reponse> proposition = new ArrayList<>();
     private Reponse bonneReponse;
@@ -19,7 +22,7 @@ public class Question extends Option{
     }
 
     public List<Reponse> getProposition() {
-        return new ArrayList<>(proposition);
+        return proposition;
     }
 
     public void setProposition(List<Reponse> propositions){

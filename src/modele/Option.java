@@ -1,7 +1,8 @@
 package modele;
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Option {
+public class Option implements Serializable {
     private int noOption;
     private String texteOption;
     static private int nb;

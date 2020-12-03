@@ -2,44 +2,36 @@ package serveur;
 
 import client.ApplicationClient;
 import modele.Joueur;
+import modele.ListeJoueur;
 import modele.Message;
 import java.io.*;
 import java.net.Socket;
+import java.util.List;
 
 public class Connexion extends Thread{
     private Socket socket;
     private Joueur joueur;
-    private ObjectInputStream in;
     private ObjectOutputStream out;
+    private ObjectInputStream in;
     private ApplicationClient app;
 
-    public Connexion(Socket socket, Joueur joueur, ApplicationClient app) {
-        try {
-            this.socket = socket;
-            this.joueur = joueur;
-            this.app = app;
-           // this.serv = s; TODO PLEURER
-            this.out = new ObjectOutputStream(this.socket.getOutputStream());
-            this.in = new ObjectInputStream(this.socket.getInputStream());
+    public Connexion(Socket socket, ObjectOutputStream out, ObjectInputStream in, Joueur joueur, ApplicationClient app) {
+        this.socket = socket;
+        this.joueur = joueur;
+        this.app = app;
+        // this.serv = s; TODO PLEURER
+        this.out = out;
+        this.in = in;
 
-            System.out.println("Fin création connexion");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        System.out.println("Fin création connexion");
     }
 
     public void run(){
-        try {
             while (true) {
-                String newLogin = (String) this.in.readObject();
-                app.getAttente().getListeJoueur().append(newLogin);
+                //System.out.println("on est la");
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
     }
+
 
     public ObjectOutputStream getOut() {
         return out;

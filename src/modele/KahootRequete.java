@@ -23,21 +23,14 @@ public class KahootRequete {
         connect = DriverManager.getConnection(url, user, mdp);
     }
 
-    public static int choixCategorie() {
-        try {
-            KahootRequete maRequete = new KahootRequete();
-            List<Categorie> List = new ArrayList<>();
-
-            int choix=0;
-            System.out.println("Quel catégorie souhaitez-vous ?");
-            List= maRequete.getCategories();
-            for (Categorie cat: List) {
-                System.out.println(cat);
-            }
-            choix = scanner.nextInt();
-            return choix;
-        } catch (SQLException throwables) { return -1 ; }
-
+    public static String getCategorie(int idCategorie) throws SQLException{
+            System.out.println(idCategorie);
+            String requet = "SELECT texteCATEGORIE FROM categorie WHERE idCATEGORIE = ?";
+            PreparedStatement pstnt = connect.prepareStatement(requet);
+            pstnt.setInt(1, idCategorie);
+            ResultSet res = pstnt.executeQuery();
+            res.next();
+            return res.getString("texteCATEGORIE");
     }
 
 
@@ -232,7 +225,7 @@ public class KahootRequete {
         return true;
     }
 
-    public Partie addPartie(Joueur Host,int port) throws SQLException {
+    public Partie addPartie(Joueur Host,int port, int idCategorie) throws SQLException {
 
             int leftLimit = 65; // letter 'A'
             int rightLimit = 90; // letter 'Z'
@@ -244,18 +237,19 @@ public class KahootRequete {
                     .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                     .toString();
 
-        String requete = "INSERT INTO partie (ID_HOTE,code,port) VALUES (?,?,?);";
+        String requete = "INSERT INTO partie (ID_HOTE,code,port,ID_CATEGORIE) VALUES (?,?,?,?);";
         PreparedStatement pstnt = connect.prepareStatement(requete,Statement.RETURN_GENERATED_KEYS);
         pstnt.setInt(1, Host.getId());
         pstnt.setString(2, generatedString);
         pstnt.setInt(3, port);
+        pstnt.setInt(4, idCategorie);
         pstnt.executeUpdate();
         ResultSet res = pstnt.getGeneratedKeys();
         int id = 0;
         if (res.next()) {
             id = res.getInt(1);
         }
-            return new Partie(id,generatedString,port) ;
+            return new Partie(id,generatedString,port,idCategorie) ;
     }
 public void addJoueurPartie(int idpartie, int idjoueur)throws SQLException{
     String requete = "INSERT INTO joueur_partie (ID_PARTIE,idJOUEUR,SCORE) VALUES (?,?,0);";

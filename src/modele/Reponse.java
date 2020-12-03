@@ -1,5 +1,8 @@
 package modele;
-public class Reponse extends Option{
+
+import java.io.Serializable;
+
+public class Reponse extends Option implements Serializable {
     public Reponse(int noOption, String texteOption) {
         super(noOption, texteOption);
     }
@@ -7,6 +10,10 @@ public class Reponse extends Option{
     @Override
     public String toString() {
         return super.getTexteOption();
+    }
+
+    public static void main(String[] args) {
+
     }
 
 }

@@ -10,24 +10,31 @@ import javax.swing.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class ApplicationClient extends JFrame {
     static int IDPORT=49513;
     LoginForm log ;
     MenuForm menu;
     AttenteForm attente;
-    KahootRequete provider ;
+    JeuForm jeu;
+    KahootRequete provider;
     List<Categorie> categorieList =new ArrayList<>();
     Joueur joueur = null;
     Partie maPartie;
     Socket s1;
     ObjectOutputStream out;
+    Serveur serv;
     public ApplicationClient(){
         try {
             provider= new KahootRequete();
@@ -37,6 +44,7 @@ public class ApplicationClient extends JFrame {
         log = new LoginForm(this);
         menu = new MenuForm(this);
         attente = new AttenteForm(this);
+        jeu = new JeuForm(this);
         setContentPane(log.getContentPane());
     }
 
@@ -48,7 +56,7 @@ public class ApplicationClient extends JFrame {
             throwables.printStackTrace();
         }
         for (Categorie cat: categorieList) {
-            menu.getComboBoxCat().addItem(cat.getCategorie());
+            menu.getComboBoxCat().addItem(cat);
         }
 }
     public void way(String actionCommand){
@@ -106,21 +114,25 @@ public class ApplicationClient extends JFrame {
             case "Creer partie":
                 //TODO LANCER LE SERV ET TOUTE LA MIFA
                 System.out.println("la");
-                Serveur serv= new Serveur(IDPORT, this);
+                serv= new Serveur(IDPORT, this);
                 serv.start();
                 try {
                     this.s1 = new Socket(InetAddress.getLocalHost(), IDPORT);
-                    System.out.println("pt");
+
                     this.out = new ObjectOutputStream(this.s1.getOutputStream());
-                    System.out.println("rt");
                     this.out.writeObject(joueur);
-                    maPartie= provider.addPartie(joueur,IDPORT);
+                    Ecouteur ec = new Ecouteur(new ObjectInputStream(this.s1.getInputStream()), this);
+                    ec.start();
+                    Categorie c = (Categorie) menu.getComboBoxCat().getSelectedItem();
+
+                    maPartie= provider.addPartie(joueur,IDPORT, c.getIdCat());
                     provider.addJoueurPartie(joueur.getId(),maPartie.getIdPartie());
                 } catch (IOException | SQLException e) {
                     e.printStackTrace();
                 }
                 IDPORT++;
                 attente.getCatname().setText(menu.getComboBoxCat().getSelectedItem().toString());
+                attente.getSalleattentlabel().setText("Salle d'attente : "+maPartie.getCodePartie());
 
 
                 setContentPane(attente.getContentPane());
@@ -136,13 +148,18 @@ public class ApplicationClient extends JFrame {
                        break;
                     }
                     res.next();
-                    maPartie= new Partie(res.getInt("ID_PARTIE"),res.getString("code"),res.getInt("port"));
+                    maPartie= new Partie(res.getInt("ID_PARTIE"),res.getString("code"),res.getInt("port"), res.getInt("ID_CATEGORIE"));
                     provider.addJoueurPartie(joueur.getId(),maPartie.getIdPartie());
                     try {
                         this.s1 = new Socket(InetAddress.getLocalHost(), res.getInt("port"));
                         this.out = new ObjectOutputStream(this.s1.getOutputStream());
                         this.out.writeObject(joueur);
+                        Ecouteur ec = new Ecouteur(new ObjectInputStream(this.s1.getInputStream()), this);
+                        ec.start();
                         setContentPane(attente.getContentPane());
+                        attente.getCatname().setText(provider.getCategorie(maPartie.getIdCategorie()));
+                        attente.getSalleattentlabel().setText("Salle d'attente : "+maPartie.getCodePartie());
+                        attente.getReadyButton().setVisible(false);
                         this.revalidate();
                         this.pack();
                         break;
@@ -165,11 +182,78 @@ public class ApplicationClient extends JFrame {
                 this.revalidate();
                 this.pack();
                 break;
+
+
+            case  "Ready" :
+                serv.isReady();
+                try {
+                    List<Question> ques = provider.getQuestion(maPartie.getIdCategorie());
+                    Collections.shuffle(ques);
+                    int i = ques.size()-1;
+                    serv.envoyerQuestion(ques.get(i));
+                    i--;
+                    ScheduledThreadPoolExecutor exec = new ScheduledThreadPoolExecutor(1);
+                    for (i=i; i!=0;i--) {
+                        int finalI = i;
+                        exec.schedule(new Runnable() {
+                            public void run() {
+                                serv.envoyerQuestion(ques.get(finalI));
+                                try {
+                                    Thread.sleep(15000);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }, 15, TimeUnit.SECONDS);
+                    }
+                    
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+                break;
             default:
 
         }
 
         }
+
+    public void afficherQuestion(Question q){
+        jeu.getCategorie().setText(q.getCategorie().getCategorie());
+        jeu.getQuestion().setText(q.getTexteOption());
+        jeu.getRepA().setText(q.getProposition().get(0).getTexteOption());
+        jeu.getRepB().setText(q.getProposition().get(1).getTexteOption());
+        jeu.getRepC().setText(q.getProposition().get(2).getTexteOption());
+        jeu.getRepD().setText(q.getProposition().get(3).getTexteOption());
+        jeu.getTimer().setText(Integer.toString(15));
+        int i = 14;
+        ScheduledThreadPoolExecutor exec = new ScheduledThreadPoolExecutor(1);
+
+        for (i=i; i!=0;i--) {
+            int finalI = i;
+            System.out.println(finalI);
+            exec.schedule(new Runnable() {
+                public void run() {
+                    jeu.getTimer().setText(Integer.toString(finalI));
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, 1, TimeUnit.SECONDS);
+        }
+        /*int index=0;
+        for (int i = 0; i<4 ; i++){
+            if(q.isCorrect(i)){
+                index = i;
+            }
+        }*/
+
+    }
+
+    public JeuForm getJeu() {
+        return jeu;
+    }
 
     public AttenteForm getAttente() {
         return attente;

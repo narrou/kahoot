@@ -10,7 +10,12 @@ public class AttenteForm extends JPanel {
     private JButton readyButton;
     private JLabel catname;
     private JTextArea listeJoueur;
+    private JLabel salleattentlabel;
     private ApplicationClient app ;
+
+    public JLabel getSalleattentlabel() {
+        return salleattentlabel;
+    }
 
     public JPanel getContentPane() {
         return contentPane;
@@ -32,6 +37,10 @@ public class AttenteForm extends JPanel {
                 app.way(e.getActionCommand());
             }
         });
+    }
+
+    public JButton getReadyButton() {
+        return readyButton;
     }
 
     public JTextArea getListeJoueur() {

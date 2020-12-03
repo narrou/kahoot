@@ -6,15 +6,16 @@ import java.util.List;
 public class Partie {
     private int idPartie;
     private String codePartie;
-    private Joueur joueurHost;
+    private int idCategorie;
     private int port;
     private List<Joueur> listJoueur;
 
-    public Partie(int idPartie, String codePartie,int port) {
+    public Partie(int idPartie, String codePartie,int port, int idCategorie) {
        listJoueur= new ArrayList<>();
         this.idPartie = idPartie;
         this.codePartie = codePartie;
         this.port=port;
+        this.idCategorie = idCategorie;
     }
 
     public int getPort() {
@@ -29,8 +30,8 @@ public class Partie {
         return codePartie;
     }
 
-    public Joueur getJoueurHost() {
-        return joueurHost;
+    public int getIdCategorie() {
+        return idCategorie;
     }
 
     public List<Joueur> getListJoueur() {

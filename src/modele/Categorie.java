@@ -1,5 +1,8 @@
 package modele;
-public class Categorie {
+
+import java.io.Serializable;
+
+public class Categorie implements Serializable {
     private String categorie;
     private int idCat;
 
@@ -35,7 +38,7 @@ public class Categorie {
 
     @Override
     public String toString() {
-        return  categorie +" id=("+ idCat+")";
+        return  categorie;
     }
 }
 
