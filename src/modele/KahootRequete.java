@@ -93,6 +93,29 @@ public class KahootRequete {
         stmt.close();
         return countJoueurs;
     }
+    public int getScore(int idJoueur, int idPartie) throws SQLException{
+        String requete = "SELECT * FROM joueur_partie WHERE idJOUEUR = ? AND ID_PARTIE = ?";
+
+        PreparedStatement pstnt = connect.prepareStatement(requete);
+        pstnt.setInt(1, idJoueur);
+        pstnt.setInt(2, idPartie);
+        ResultSet res = pstnt.executeQuery();
+        res.next();
+        return res.getInt("SCORE");
+
+    }
+    /*public List<Joueur> getTableauScore(int idpartie) throws SQLException {//TODO
+        List<> List = new ArrayList<>(); //TODO TROUVER UNE LISTE DE QUOI
+        String requet = "SELECT login,SCORE FROM joueur,joueur_partie WHERE joueur.idJOUEUR=joueur_partie.idJOUEUR AND joueur_partie.ID_PARTIE =? ORDER BY joueur_partie.SCORE ASC";
+        PreparedStatement pstnt = connect.prepareStatement(requet);
+        pstnt.setInt(1, idpartie);
+        ResultSet res = pstnt.executeQuery();
+        while (res.next()) {
+            //List.add(new Joueur(res.getString(2),res.getInt(1)));
+
+        }
+        return ;//List;
+    }*/
 
     public Joueur getJoueur(int idJoueur) throws SQLException {
         Joueur leJoueur = null;

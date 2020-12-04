@@ -125,4 +125,7 @@ public class JeuForm extends JDialog {
         return contentPane;
     }
 
+    public JLabel getScore() {
+        return score;
+    }
 }

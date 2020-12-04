@@ -191,13 +191,13 @@ public class ApplicationClient extends JFrame {
                     Collections.shuffle(ques);
                     int i = ques.size()-1;
                     serv.envoyerQuestion(ques.get(i));
+                    jeu.getScore().setText("0");
                     i--;
                     ScheduledThreadPoolExecutor exec = new ScheduledThreadPoolExecutor(1);
                     for (i=i; i!=0;i--) {
-                        jeu.getRepA().setEnabled(true);
-                        jeu.getRepB().setEnabled(true);
-                        jeu.getRepC().setEnabled(true);
-                        jeu.getRepD().setEnabled(true);
+                       //int score= provider.getScore(joueur.getId(),maPartie.getIdPartie());
+                        //jeu.getScore().setText(Integer.toString(score));
+                        jeu.enablebutton(true);
                         int finalI = i;
                         exec.schedule(new Runnable() {
                             public void run() {
@@ -217,6 +217,8 @@ public class ApplicationClient extends JFrame {
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
                 }
+
+
                 break;
             default:
 
