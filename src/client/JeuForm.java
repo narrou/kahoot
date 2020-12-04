@@ -1,6 +1,11 @@
 package client;
 
+import modele.Question;
+
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class JeuForm extends JDialog {
     private JPanel contentPane;
@@ -15,13 +20,75 @@ public class JeuForm extends JDialog {
     private JLabel repD;
     private JLabel categorie;
     private JLabel timer;
-    private JButton buttonOK;
+    private JLabel bonneReponse;
+    private JLabel toStringBonneRep;
+    private JLabel score;
+    private JLabel toStringScore;
     private ApplicationClient app;
 
     public JeuForm(ApplicationClient app) {
         this.app = app;
+        aButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+               boolean v=  app.validation(getRepA().getText());
+                System.out.println(v);
+                if (v)
+                    aButton.setBackground(Color.green);
+                else
+                    aButton.setBackground(Color.red);
+                enablebutton(false);
+            }
+        });
+        bButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                boolean v=  app.validation(getRepB().getText());
+                System.out.println(v);
+                if (v)
+                    bButton.setBackground(Color.green);
+                else
+                    bButton.setBackground(Color.red);
+                enablebutton(false);
+            }
+        });
+        cButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                boolean v=  app.validation(getRepC().getText());
+                System.out.println(v);
+                if (v)
+                    cButton.setBackground(Color.green);
+                else
+                    cButton.setBackground(Color.red);
+                enablebutton(false);
+            }
+        });
+        dButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                boolean v=  app.validation(getRepD().getText());
+                System.out.println(v);
+                if (v)
+                    dButton.setBackground(Color.green);
+                else
+                    dButton.setBackground(Color.red);
+                enablebutton(false);
+            }
+        });
     }
 
+    public void enablebutton(boolean b){
+        toStringBonneRep.setVisible(!b);
+        bonneReponse.setVisible(!b);
+        aButton.setEnabled(b);
+        bButton.setEnabled(b);
+        cButton.setEnabled(b);
+        dButton.setEnabled(b);
+        if (b){
+            aButton.setBackground(null);
+            bButton.setBackground(null);
+            cButton.setBackground(null);
+            dButton.setBackground(null);
+        }
+
+    }
     public JLabel getTimer() {
         return timer;
     }
@@ -32,6 +99,10 @@ public class JeuForm extends JDialog {
 
     public JLabel getRepA() {
         return repA;
+    }
+
+    public JLabel getBonneReponse() {
+        return bonneReponse;
     }
 
     public JLabel getRepB() {

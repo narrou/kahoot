@@ -194,6 +194,10 @@ public class ApplicationClient extends JFrame {
                     i--;
                     ScheduledThreadPoolExecutor exec = new ScheduledThreadPoolExecutor(1);
                     for (i=i; i!=0;i--) {
+                        jeu.getRepA().setEnabled(true);
+                        jeu.getRepB().setEnabled(true);
+                        jeu.getRepC().setEnabled(true);
+                        jeu.getRepD().setEnabled(true);
                         int finalI = i;
                         exec.schedule(new Runnable() {
                             public void run() {
@@ -205,6 +209,9 @@ public class ApplicationClient extends JFrame {
                                 }
                             }
                         }, 15, TimeUnit.SECONDS);
+
+
+
                     }
                     
                 } catch (SQLException throwables) {
@@ -224,11 +231,13 @@ public class ApplicationClient extends JFrame {
         jeu.getRepB().setText(q.getProposition().get(1).getTexteOption());
         jeu.getRepC().setText(q.getProposition().get(2).getTexteOption());
         jeu.getRepD().setText(q.getProposition().get(3).getTexteOption());
+        jeu.getBonneReponse().setText(q.getBonneReponse().toString());
         jeu.getTimer().setText(Integer.toString(15));
         int i = 14;
         ScheduledThreadPoolExecutor exec = new ScheduledThreadPoolExecutor(1);
 
         for (i=i; i!=0;i--) {
+            jeu.enablebutton(true);
             int finalI = i;
             System.out.println(finalI);
             exec.schedule(new Runnable() {
@@ -242,13 +251,22 @@ public class ApplicationClient extends JFrame {
                 }
             }, 1, TimeUnit.SECONDS);
         }
-        /*int index=0;
-        for (int i = 0; i<4 ; i++){
-            if(q.isCorrect(i)){
-                index = i;
-            }
-        }*/
 
+    }
+
+    public boolean validation(String choix)
+    {
+       // System.out.println(choix+jeu.getBonneReponse().getText());
+        if (choix.equals(jeu.getBonneReponse().getText())) {
+           /* try {
+                provider.setScore(joueur.getId());
+                */return true;/*
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }*/
+
+        }
+        return false;
     }
 
     public JeuForm getJeu() {
@@ -266,6 +284,12 @@ public class ApplicationClient extends JFrame {
         ApplicationClient f1 = new ApplicationClient();
         f1.setVisible(true);
         f1.pack();
+       /* ApplicationClient f2= new ApplicationClient();
+        f2.setVisible(true);
+        f2.pack();
+        ApplicationClient f3= new ApplicationClient();
+        f3.setVisible(true);
+        f3.pack();*/
     }
 }
 

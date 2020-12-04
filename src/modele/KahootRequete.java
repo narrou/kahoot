@@ -16,8 +16,8 @@ public class KahootRequete {
     private static Scanner scanner = new Scanner(System.in);
     private static Connection connect;
     private static String url = "jdbc:mysql://localhost:3306/kahoot3?zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=UTC";
-    private static String user = "admin";
-    private static String mdp = "Marie0212";
+    private static String user = "root";
+    private static String mdp = "";
 
     public KahootRequete() throws SQLException {
         connect = DriverManager.getConnection(url, user, mdp);
@@ -258,6 +258,13 @@ public void addJoueurPartie(int idpartie, int idjoueur)throws SQLException{
     pstnt.setInt(2, idjoueur);
     pstnt.executeUpdate();
 
+}
+
+public void setScore(int idJoueur) throws SQLException {
+    String requete = "INSERT INTO joueur_partie (SCORE) VALUES (?);";
+    PreparedStatement pstnt = connect.prepareStatement(requete);
+    pstnt.setInt(1,idJoueur) ;
+    pstnt.executeUpdate();
 }
 
 
