@@ -23,12 +23,10 @@ public class Ecouteur extends Thread {
     public void run() {
         try {
             while (true) {
-                System.out.println("En attente d'un nouveau joueur");
                 String verif =(String) in.readObject();
                 if (verif.equals("NotReady")) {
                     ListeJoueur txt = (ListeJoueur) in.readObject();
                     if (txt != null) {
-                        System.out.println(txt.toString());
                         app.getAttente().getListeJoueur().setText("");
                         for (Joueur j : txt.getListJoueur()) {
 
@@ -37,24 +35,21 @@ public class Ecouteur extends Thread {
 
                     }
                 }
-                else {
+                else if (verif.equals("Ready")) {
                     app.setContentPane(app.getJeu().getContentPane());
                     app.revalidate();
                     app.setSize(700,500);
-                    while (true){
-                        Question q = (Question) in.readObject();
-                        app.afficherQuestion(q);
-                    }
+                    Question q = (Question) in.readObject();
+                    app.afficherQuestion(q);
 
+                }
+                else if (verif.equals("Over")) {
+                    app.endgame();
                 }
 
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
+        } catch (IOException | SQLException | ClassNotFoundException e) {
+            System.out.println(e.getMessage());
         }
     }
 

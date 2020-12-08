@@ -34,14 +34,14 @@ public class Serveur extends Thread{
         return connexions;
     }
 
-    private void fermerSocketEcoute(){
+    public void fermerSocketEcoute(){
         try {
             for (Connexion co: this.connexions){
                 co.fermerSocket();
             }
             socEcoute.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Socket fermé");
         }
     }
 
@@ -58,23 +58,26 @@ public class Serveur extends Thread{
         }
     }
 
-    public void isReady(){
+    public void isOver(){
         for (Connexion c : connexions){
             try {
                 ObjectOutputStream oos = c.getOut();
                 oos.reset();
-                oos.writeObject("Ready");
+                oos.writeObject("Over");
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
+
+
     public void envoyerQuestion(Question q){
         for (Connexion c : connexions){
             try {
                 ObjectOutputStream oos = c.getOut();
                 oos.reset();
+                oos.writeObject("Ready");
                 oos.writeObject(q);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -103,7 +106,7 @@ public class Serveur extends Thread{
                 System.out.println(connexions.size());
             }while (true);
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
         finally {
             fermerSocketEcoute();

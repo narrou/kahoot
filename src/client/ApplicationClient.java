@@ -7,10 +7,7 @@ import serveur.Serveur;
 
 
 import javax.swing.*;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.sql.ResultSet;
@@ -23,20 +20,21 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class ApplicationClient extends JFrame {
-    static int IDPORT=49513;
-    LoginForm log ;
-    MenuForm menu;
-    AttenteForm attente;
-    JeuForm jeu;
-    tableauScore finjeu;
-    KahootRequete provider;
-    List<Categorie> categorieList =new ArrayList<>();
-    List<String> tableauScore = new ArrayList<>();
-    Joueur joueur = null;
-    Partie maPartie;
-    Socket s1;
-    ObjectOutputStream out;
-    Serveur serv;
+    private static int IDPORT=49513;
+    private LoginForm log ;
+    private MenuForm menu;
+    private AttenteForm attente;
+    private JeuForm jeu;
+    private tableauScore finjeu;
+    private KahootRequete provider;
+    private List<Categorie> categorieList =new ArrayList<>();
+    private List<String> tableauScore = new ArrayList<>();
+    private Joueur joueur = null;
+    private Partie maPartie;
+    private Socket s1;
+    private ObjectOutputStream out;
+    private Serveur serv;
+
     public ApplicationClient(){
         try {
             provider= new KahootRequete();
@@ -63,8 +61,6 @@ public class ApplicationClient extends JFrame {
         }
 }
     public void way(String actionCommand){
-
-        System.out.println(actionCommand);
 
         switch (actionCommand) {
 
@@ -105,7 +101,10 @@ public class ApplicationClient extends JFrame {
                 break;
 
             case "Ajouter JSON":
-                provider.remplirBdd(menu.getJSONfield().getText());
+                final JFileChooser fc = new JFileChooser();
+                int returnVal = fc.showOpenDialog(this);
+                File file = fc.getSelectedFile();
+                provider.remplirBdd(file.getAbsolutePath());
                 menu.getJSONfield().setText("");
                 updatecombobox(categorieList);
                 this.revalidate();
@@ -115,6 +114,7 @@ public class ApplicationClient extends JFrame {
             case "Creer partie":
                 serv= new Serveur(IDPORT, this);
                 serv.start();
+                attente.getReadyButton().setVisible(true);
                 try {
                     this.s1 = new Socket(InetAddress.getLocalHost(), IDPORT);
 
@@ -183,16 +183,14 @@ public class ApplicationClient extends JFrame {
 
 
             case  "Ready" :
-                serv.isReady();
                 try {
                     List<Question> ques = provider.getQuestion(maPartie.getIdCategorie());
                     Collections.shuffle(ques);
-                    int i = ques.size()-1; // PEUT ETRE ICI A MODIF
+                    int i = ques.size()-1;
                     serv.envoyerQuestion(ques.get(i));
-                    jeu.getScore().setText("0"); //TODO LE 0 EST SET QUE POUR LE PREMIER UTILISATEUR
                     i--;
                     ScheduledThreadPoolExecutor exec = new ScheduledThreadPoolExecutor(1);
-                    for (i=i; i!=0;i--) { // TODO 9 QUESTIONS SONT POSEES AU LIEU DES 10
+                    for (i=i; i>=0;i--) {
                         jeu.enablebutton(true);
                         int finalI = i;
                         exec.schedule(new Runnable() {
@@ -200,6 +198,10 @@ public class ApplicationClient extends JFrame {
                                 serv.envoyerQuestion(ques.get(finalI));
                                 try {
                                     Thread.sleep(15000);
+                                    if (finalI==0){
+                                        serv.isOver();
+                                        serv.fermerSocketEcoute();
+                                    }
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 }
@@ -214,16 +216,13 @@ public class ApplicationClient extends JFrame {
                     throwables.printStackTrace();
                 }
 
-                //TODO FERMER LE SERV ETC... ET APPELER ENDGAME() SANS BUG
-                // endgame();
-
 
                 break;
         }
 
         }
 
-        public void endgame(){ //TODO TROUVER OU APPELER LA FOCNTION
+        public void endgame(){
             try {
                 tableauScore = provider.getTableauScore(maPartie.getIdPartie());
                 for(int i=0; tableauScore.size()!=i;i++)
@@ -245,6 +244,9 @@ public class ApplicationClient extends JFrame {
         jeu.getRepD().setText(q.getProposition().get(3).getTexteOption());
         jeu.getBonneReponse().setText(q.getBonneReponse().toString());
         jeu.getTimer().setText(Integer.toString(15));
+
+        int score= provider.getScore(joueur.getId(),maPartie.getIdPartie());
+        jeu.getScore().setText(Integer.toString(score));
 
         int i = 14;
         ScheduledThreadPoolExecutor exec = new ScheduledThreadPoolExecutor(1);
@@ -298,12 +300,12 @@ public class ApplicationClient extends JFrame {
         ApplicationClient f1 = new ApplicationClient();
         f1.setVisible(true);
         f1.pack();
-       /* ApplicationClient f2= new ApplicationClient();
+        ApplicationClient f2= new ApplicationClient();
         f2.setVisible(true);
         f2.pack();
         ApplicationClient f3= new ApplicationClient();
         f3.setVisible(true);
-        f3.pack();*/
+        f3.pack();
     }
 }
 

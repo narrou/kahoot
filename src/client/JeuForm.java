@@ -31,7 +31,6 @@ public class JeuForm extends JDialog {
         aButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                boolean v=  app.validation(getRepA().getText());
-                System.out.println(v);
                 if (v)
                     aButton.setBackground(Color.green);
                 else
@@ -42,7 +41,6 @@ public class JeuForm extends JDialog {
         bButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 boolean v=  app.validation(getRepB().getText());
-                System.out.println(v);
                 if (v)
                     bButton.setBackground(Color.green);
                 else
@@ -53,7 +51,6 @@ public class JeuForm extends JDialog {
         cButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 boolean v=  app.validation(getRepC().getText());
-                System.out.println(v);
                 if (v)
                     cButton.setBackground(Color.green);
                 else
@@ -64,7 +61,6 @@ public class JeuForm extends JDialog {
         dButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 boolean v=  app.validation(getRepD().getText());
-                System.out.println(v);
                 if (v)
                     dButton.setBackground(Color.green);
                 else

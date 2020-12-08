@@ -19,7 +19,6 @@ public class Connexion extends Thread{
         this.socket = socket;
         this.joueur = joueur;
         this.app = app;
-        // this.serv = s; TODO PLEURER
         this.out = out;
         this.in = in;
 
@@ -28,7 +27,6 @@ public class Connexion extends Thread{
 
     public void run(){
             while (true) {
-                //System.out.println("on est la");
             }
     }
 
@@ -37,9 +35,6 @@ public class Connexion extends Thread{
         return out;
     }
 
-    private synchronized void envoyerMessage(String message){
-
-    }
 
     public void fermerSocket() throws IOException {
         this.socket.close();

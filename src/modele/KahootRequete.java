@@ -9,6 +9,7 @@ import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.*;
 
@@ -17,14 +18,13 @@ public class KahootRequete {
     private static Connection connect;
     private static String url = "jdbc:mysql://localhost:3306/kahoot3?zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=UTC";
     private static String user = "root";
-    private static String mdp = "";
+    private static String mdp = "Marie0212";
 
     public KahootRequete() throws SQLException {
         connect = DriverManager.getConnection(url, user, mdp);
     }
 
     public static String getCategorie(int idCategorie) throws SQLException{
-            System.out.println(idCategorie);
             String requet = "SELECT texteCATEGORIE FROM categorie WHERE idCATEGORIE = ?";
             PreparedStatement pstnt = connect.prepareStatement(requet);
             pstnt.setInt(1, idCategorie);
@@ -101,11 +101,11 @@ public class KahootRequete {
         ResultSet res = pstnt.executeQuery();
         res.next();
         return res.getInt("SCORE");
-
     }
+
     public List<String> getTableauScore(int idpartie) throws SQLException {
         List<String> List = new ArrayList<>(); 
-        String requet = "SELECT login,SCORE FROM joueur,joueur_partie WHERE joueur.idJOUEUR=joueur_partie.idJOUEUR AND joueur_partie.ID_PARTIE =? ORDER BY joueur_partie.SCORE ASC";
+        String requet = "SELECT login,SCORE FROM joueur,joueur_partie WHERE joueur.idJOUEUR=joueur_partie.idJOUEUR AND joueur_partie.ID_PARTIE =? ORDER BY joueur_partie.SCORE DESC";
         PreparedStatement pstnt = connect.prepareStatement(requet);
         pstnt.setInt(1, idpartie);
         ResultSet res = pstnt.executeQuery();
@@ -115,6 +115,7 @@ public class KahootRequete {
             List.add(i+" : " + res.getString("login")+" avec un total de : "+res.getInt("SCORE"));
         i++;
         }
+        System.out.println(List);
         return List;
     }
 
@@ -172,8 +173,9 @@ public class KahootRequete {
     }
 
     public int addCategorie(Categorie categorie) throws SQLException {
-        String requete = "INSERT INTO CATEGORIE(texteCATEGORIE) VALUES ('" + categorie.getCategorie() + "')";
+        String requete = "INSERT INTO CATEGORIE(texteCATEGORIE) VALUES (?)";
         PreparedStatement pstmt = connect.prepareStatement(requete, Statement.RETURN_GENERATED_KEYS);
+        pstmt.setString(1, categorie.getCategorie());
         pstmt.executeUpdate();
         ResultSet res = pstmt.getGeneratedKeys();
         int id = 0;
@@ -186,8 +188,9 @@ public class KahootRequete {
     }
 
     public int addReponse(Reponse reponse) throws SQLException {
-        String requete = "INSERT INTO REPONSE(texteREPONSE) VALUES ('" + reponse.getTexteOption() + "')";
+        String requete = "INSERT INTO REPONSE(texteREPONSE) VALUES (?)";
         PreparedStatement pstmt = connect.prepareStatement(requete, Statement.RETURN_GENERATED_KEYS);
+        pstmt.setString(1, reponse.getTexteOption());
         pstmt.executeUpdate();
         ResultSet res = pstmt.getGeneratedKeys();
         int id = 0;
@@ -302,11 +305,11 @@ public void setScore(int idJoueur, int idPartie) throws SQLException {
             KahootRequete maRequete = new KahootRequete();
 
             try {
-                JSONObject jsonObject = (JSONObject) parser.parse(new FileReader(fic));
+                JSONObject jsonObject = (JSONObject) parser.parse(new FileReader(fic, StandardCharsets.UTF_8));
                 Categorie theme = new Categorie((String) jsonObject.get("thème"));
                 int idCat = maRequete.addCategorie(theme);
                 theme.setIdCat(idCat);
-                JSONArray tableauFrDeb = (JSONArray) ((JSONObject) ((JSONObject) jsonObject.get("quizz")).get("fr")).get("expert");
+                JSONArray tableauFrDeb = (JSONArray) ((JSONObject) ((JSONObject) jsonObject.get("quizz")).get("fr")).get("débutant");
                 Iterator iteratorQuestion = tableauFrDeb.iterator();
                 while (iteratorQuestion.hasNext()) {
 
