@@ -1,21 +1,19 @@
 package client;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.nio.charset.Charset;
-import java.util.Random;
 
 public class LoginForm extends JPanel {
     private JPanel contentPane;
-    private JButton connectionButton;
+    private JButton connexionButton;
     private JTextField logininsc;
     private JTextField mdpinsc;
     private JButton sInscrireButton;
     private JTextField login;
     private JTextField mdp;
     private JLabel InfoLabel;
+    private JLabel ConnexionLabel;
     private ApplicationClient app ;
 
     public JLabel getInfoLabel() {
@@ -45,7 +43,7 @@ public class LoginForm extends JPanel {
                app.way(e.getActionCommand());
             }
         });
-        connectionButton.addActionListener(new ActionListener() {
+        connexionButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 app.way(e.getActionCommand());
             }

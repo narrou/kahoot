@@ -28,8 +28,10 @@ public class ApplicationClient extends JFrame {
     MenuForm menu;
     AttenteForm attente;
     JeuForm jeu;
+    tableauScore finjeu;
     KahootRequete provider;
     List<Categorie> categorieList =new ArrayList<>();
+    List<String> tableauScore = new ArrayList<>();
     Joueur joueur = null;
     Partie maPartie;
     Socket s1;
@@ -45,6 +47,7 @@ public class ApplicationClient extends JFrame {
         menu = new MenuForm(this);
         attente = new AttenteForm(this);
         jeu = new JeuForm(this);
+        finjeu=new tableauScore(this);
         setContentPane(log.getContentPane());
     }
 
@@ -80,7 +83,7 @@ public class ApplicationClient extends JFrame {
                 }
                 joueur = newJoueur;
 
-            case "Connection":
+            case "Connexion": case  "Menu" :
                 if (joueur == null) {
                     if (log.getLogin().getText().isEmpty() || log.getMdp().getText().isEmpty()) {
                         log.getInfoLabel().setText("completer les deux champs");
@@ -94,8 +97,6 @@ public class ApplicationClient extends JFrame {
                         this.pack();
                     }
                 }
-            case "Retour" :
-                //TODO CLOSE LA PARTIE / SERV
                 menu.getPseudo().setText(joueur.getLogin());
                 updatecombobox(categorieList);
                 setContentPane(menu.getContentPane());
@@ -112,8 +113,6 @@ public class ApplicationClient extends JFrame {
                 break;
 
             case "Creer partie":
-                //TODO LANCER LE SERV ET TOUTE LA MIFA
-                System.out.println("la");
                 serv= new Serveur(IDPORT, this);
                 serv.start();
                 try {
@@ -126,7 +125,7 @@ public class ApplicationClient extends JFrame {
                     Categorie c = (Categorie) menu.getComboBoxCat().getSelectedItem();
 
                     maPartie= provider.addPartie(joueur,IDPORT, c.getIdCat());
-                    provider.addJoueurPartie(joueur.getId(),maPartie.getIdPartie());
+                    provider.addJoueurPartie(maPartie.getIdPartie(),joueur.getId());
                 } catch (IOException | SQLException e) {
                     e.printStackTrace();
                 }
@@ -140,7 +139,6 @@ public class ApplicationClient extends JFrame {
                 this.pack();
                 break;
             case "Rejoindre partie":
-                //TODO
                 String codejoin = menu.getJoinCode().getText();
                 try {
                     ResultSet res = provider.getPartie(codejoin);
@@ -149,7 +147,7 @@ public class ApplicationClient extends JFrame {
                     }
                     res.next();
                     maPartie= new Partie(res.getInt("ID_PARTIE"),res.getString("code"),res.getInt("port"), res.getInt("ID_CATEGORIE"));
-                    provider.addJoueurPartie(joueur.getId(),maPartie.getIdPartie());
+                    provider.addJoueurPartie(maPartie.getIdPartie(),joueur.getId());
                     try {
                         this.s1 = new Socket(InetAddress.getLocalHost(), res.getInt("port"));
                         this.out = new ObjectOutputStream(this.s1.getOutputStream());
@@ -189,14 +187,12 @@ public class ApplicationClient extends JFrame {
                 try {
                     List<Question> ques = provider.getQuestion(maPartie.getIdCategorie());
                     Collections.shuffle(ques);
-                    int i = ques.size()-1;
+                    int i = ques.size()-1; // PEUT ETRE ICI A MODIF
                     serv.envoyerQuestion(ques.get(i));
-                    jeu.getScore().setText("0");
+                    jeu.getScore().setText("0"); //TODO LE 0 EST SET QUE POUR LE PREMIER UTILISATEUR
                     i--;
                     ScheduledThreadPoolExecutor exec = new ScheduledThreadPoolExecutor(1);
-                    for (i=i; i!=0;i--) {
-                       //int score= provider.getScore(joueur.getId(),maPartie.getIdPartie());
-                        //jeu.getScore().setText(Integer.toString(score));
+                    for (i=i; i!=0;i--) { // TODO 9 QUESTIONS SONT POSEES AU LIEU DES 10
                         jeu.enablebutton(true);
                         int finalI = i;
                         exec.schedule(new Runnable() {
@@ -210,23 +206,37 @@ public class ApplicationClient extends JFrame {
                             }
                         }, 15, TimeUnit.SECONDS);
 
-
-
                     }
+
+
                     
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
                 }
 
+                //TODO FERMER LE SERV ETC... ET APPELER ENDGAME() SANS BUG
+                // endgame();
+
 
                 break;
-            default:
-
         }
 
         }
 
-    public void afficherQuestion(Question q){
+        public void endgame(){ //TODO TROUVER OU APPELER LA FOCNTION
+            try {
+                tableauScore = provider.getTableauScore(maPartie.getIdPartie());
+                for(int i=0; tableauScore.size()!=i;i++)
+                    finjeu.getTextArea1().append(tableauScore.get(i)+"\n");
+                setContentPane(finjeu.getContentPane());
+                this.revalidate();
+
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        }
+
+    public void afficherQuestion(Question q) throws SQLException {
         jeu.getCategorie().setText(q.getCategorie().getCategorie());
         jeu.getQuestion().setText(q.getTexteOption());
         jeu.getRepA().setText(q.getProposition().get(0).getTexteOption());
@@ -235,13 +245,13 @@ public class ApplicationClient extends JFrame {
         jeu.getRepD().setText(q.getProposition().get(3).getTexteOption());
         jeu.getBonneReponse().setText(q.getBonneReponse().toString());
         jeu.getTimer().setText(Integer.toString(15));
+
         int i = 14;
         ScheduledThreadPoolExecutor exec = new ScheduledThreadPoolExecutor(1);
 
         for (i=i; i!=0;i--) {
             jeu.enablebutton(true);
             int finalI = i;
-            System.out.println(finalI);
             exec.schedule(new Runnable() {
                 public void run() {
                     jeu.getTimer().setText(Integer.toString(finalI));
@@ -258,14 +268,16 @@ public class ApplicationClient extends JFrame {
 
     public boolean validation(String choix)
     {
-       // System.out.println(choix+jeu.getBonneReponse().getText());
+
         if (choix.equals(jeu.getBonneReponse().getText())) {
-           /* try {
-                provider.setScore(joueur.getId());
-                */return true;/*
+            try {
+                provider.setScore(joueur.getId(),maPartie.getIdPartie());
+                int score= provider.getScore(joueur.getId(),maPartie.getIdPartie());
+                jeu.getScore().setText(Integer.toString(score));
+                return true;
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
-            }*/
+            }
 
         }
         return false;

@@ -8,6 +8,7 @@ import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.sql.SQLException;
 
 public class Ecouteur extends Thread {
     private ObjectInputStream in;
@@ -52,6 +53,8 @@ public class Ecouteur extends Thread {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
     }
 

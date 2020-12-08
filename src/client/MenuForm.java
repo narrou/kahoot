@@ -14,10 +14,15 @@ public class MenuForm extends JPanel {
     private JButton ajouterJSONButton;
     private JLabel pseudo;
     private JButton logoutButton;
+    private JLabel erreurlabel;
     private ApplicationClient app ;
 
     public JTextField getJoinCode() {
         return joinCode;
+    }
+
+    public JLabel getErreurlabel() {
+        return erreurlabel;
     }
 
     public JLabel getPseudo() {

@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 
 public class AttenteForm extends JPanel {
     private JPanel contentPane;
-    private JButton retourButton;
     private JButton readyButton;
     private JLabel catname;
     private JTextArea listeJoueur;
@@ -28,11 +27,6 @@ public class AttenteForm extends JPanel {
     public AttenteForm(ApplicationClient application) {
         app=application;
         readyButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                app.way(e.getActionCommand());
-            }
-        });
-        retourButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 app.way(e.getActionCommand());
             }

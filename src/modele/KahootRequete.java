@@ -95,7 +95,6 @@ public class KahootRequete {
     }
     public int getScore(int idJoueur, int idPartie) throws SQLException{
         String requete = "SELECT * FROM joueur_partie WHERE idJOUEUR = ? AND ID_PARTIE = ?";
-
         PreparedStatement pstnt = connect.prepareStatement(requete);
         pstnt.setInt(1, idJoueur);
         pstnt.setInt(2, idPartie);
@@ -104,18 +103,20 @@ public class KahootRequete {
         return res.getInt("SCORE");
 
     }
-    /*public List<Joueur> getTableauScore(int idpartie) throws SQLException {//TODO
-        List<> List = new ArrayList<>(); //TODO TROUVER UNE LISTE DE QUOI
+    public List<String> getTableauScore(int idpartie) throws SQLException {
+        List<String> List = new ArrayList<>(); 
         String requet = "SELECT login,SCORE FROM joueur,joueur_partie WHERE joueur.idJOUEUR=joueur_partie.idJOUEUR AND joueur_partie.ID_PARTIE =? ORDER BY joueur_partie.SCORE ASC";
         PreparedStatement pstnt = connect.prepareStatement(requet);
         pstnt.setInt(1, idpartie);
         ResultSet res = pstnt.executeQuery();
+        int i=1;
         while (res.next()) {
-            //List.add(new Joueur(res.getString(2),res.getInt(1)));
 
+            List.add(i+" : " + res.getString("login")+" avec un total de : "+res.getInt("SCORE"));
+        i++;
         }
-        return ;//List;
-    }*/
+        return List;
+    }
 
     public Joueur getJoueur(int idJoueur) throws SQLException {
         Joueur leJoueur = null;
@@ -283,10 +284,11 @@ public void addJoueurPartie(int idpartie, int idjoueur)throws SQLException{
 
 }
 
-public void setScore(int idJoueur) throws SQLException {
-    String requete = "INSERT INTO joueur_partie (SCORE) VALUES (?);";
+public void setScore(int idJoueur, int idPartie) throws SQLException {
+    String requete = "UPDATE `joueur_partie` SET `SCORE` = SCORE+ 1 WHERE ID_PARTIE = ? AND idJOUEUR = ?;";
     PreparedStatement pstnt = connect.prepareStatement(requete);
-    pstnt.setInt(1,idJoueur) ;
+    pstnt.setInt(1,idPartie) ;
+    pstnt.setInt(2,idJoueur) ;
     pstnt.executeUpdate();
 }
 

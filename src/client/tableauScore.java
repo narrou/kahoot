@@ -8,16 +8,21 @@ import java.awt.event.ActionListener;
 public class tableauScore extends JDialog {
     private JPanel contentPane;
     private JTextArea textArea1;
-    private JButton menuButton;
+    private JButton Connexion;
     private ApplicationClient app;
 
     public tableauScore(ApplicationClient app) {
         this.app = app;
-        menuButton.addActionListener(new ActionListener() {
+        Connexion.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 app.way(e.getActionCommand());
             }
         });
+    }
+
+    @Override
+    public JPanel getContentPane() {
+        return contentPane;
     }
 
     public JTextArea getTextArea1() {
