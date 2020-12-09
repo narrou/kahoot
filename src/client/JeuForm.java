@@ -24,6 +24,7 @@ public class JeuForm extends JDialog {
     private JLabel toStringBonneRep;
     private JLabel score;
     private JLabel toStringScore;
+    private JLabel nomJoueur;
     private ApplicationClient app;
 
     public JeuForm(ApplicationClient app) {
@@ -119,6 +120,10 @@ public class JeuForm extends JDialog {
 
     public JPanel getContentPane() {
         return contentPane;
+    }
+
+    public JLabel getNomJoueur() {
+        return nomJoueur;
     }
 
     public JLabel getScore() {

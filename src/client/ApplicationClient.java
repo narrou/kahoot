@@ -49,17 +49,6 @@ public class ApplicationClient extends JFrame {
         setContentPane(log.getContentPane());
     }
 
-    public void updatecombobox(List<Categorie> categorieList){
-            menu.getComboBoxCat().removeAllItems();
-        try {
-            categorieList = provider.getCategories();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-        for (Categorie cat: categorieList) {
-            menu.getComboBoxCat().addItem(cat);
-        }
-}
     public void way(String actionCommand){
 
         switch (actionCommand) {
@@ -104,8 +93,8 @@ public class ApplicationClient extends JFrame {
                 final JFileChooser fc = new JFileChooser();
                 int returnVal = fc.showOpenDialog(this);
                 File file = fc.getSelectedFile();
+                if(returnVal == 0)
                 provider.remplirBdd(file.getAbsolutePath());
-                menu.getJSONfield().setText("");
                 updatecombobox(categorieList);
                 this.revalidate();
                 this.pack();
@@ -149,7 +138,7 @@ public class ApplicationClient extends JFrame {
                     maPartie= new Partie(res.getInt("ID_PARTIE"),res.getString("code"),res.getInt("port"), res.getInt("ID_CATEGORIE"));
                     provider.addJoueurPartie(maPartie.getIdPartie(),joueur.getId());
                     try {
-                        this.s1 = new Socket(InetAddress.getLocalHost(), res.getInt("port"));
+                        this.s1 = new Socket("192.168.43.58", res.getInt("port"));
                         this.out = new ObjectOutputStream(this.s1.getOutputStream());
                         this.out.writeObject(joueur);
                         Ecouteur ec = new Ecouteur(new ObjectInputStream(this.s1.getInputStream()), this);
@@ -221,6 +210,17 @@ public class ApplicationClient extends JFrame {
         }
 
         }
+    public void updatecombobox(List<Categorie> categorieList){
+        menu.getComboBoxCat().removeAllItems();
+        try {
+            categorieList = provider.getCategories();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        for (Categorie cat: categorieList) {
+            menu.getComboBoxCat().addItem(cat);
+        }
+    }
 
         public void endgame(){
             try {
@@ -236,6 +236,7 @@ public class ApplicationClient extends JFrame {
         }
 
     public void afficherQuestion(Question q) throws SQLException {
+        jeu.getNomJoueur().setText(joueur.getLogin());
         jeu.getCategorie().setText(q.getCategorie().getCategorie());
         jeu.getQuestion().setText(q.getTexteOption());
         jeu.getRepA().setText(q.getProposition().get(0).getTexteOption());
@@ -300,12 +301,12 @@ public class ApplicationClient extends JFrame {
         ApplicationClient f1 = new ApplicationClient();
         f1.setVisible(true);
         f1.pack();
-        ApplicationClient f2= new ApplicationClient();
+       /* ApplicationClient f2= new ApplicationClient();
         f2.setVisible(true);
         f2.pack();
         ApplicationClient f3= new ApplicationClient();
         f3.setVisible(true);
-        f3.pack();
+        f3.pack();*/
     }
 }
 

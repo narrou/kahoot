@@ -8,10 +8,10 @@ public class LoginForm extends JPanel {
     private JPanel contentPane;
     private JButton connexionButton;
     private JTextField logininsc;
-    private JTextField mdpinsc;
+    private JPasswordField mdpinsc;
     private JButton sInscrireButton;
     private JTextField login;
-    private JTextField mdp;
+    private JPasswordField mdp;
     private JLabel InfoLabel;
     private JLabel ConnexionLabel;
     private ApplicationClient app ;
@@ -24,7 +24,7 @@ public class LoginForm extends JPanel {
         return logininsc;
     }
 
-    public JTextField getMdpinsc() {
+    public JPasswordField getMdpinsc() {
         return mdpinsc;
     }
 
@@ -32,7 +32,7 @@ public class LoginForm extends JPanel {
         return login;
     }
 
-    public JTextField getMdp() {
+    public JPasswordField getMdp() {
         return mdp;
     }
 
@@ -52,10 +52,6 @@ public class LoginForm extends JPanel {
 
     public JPanel getContentPane() {
         return contentPane;
-    }
-
-    public JButton getsInscrireButton() {
-        return sInscrireButton;
     }
 
 

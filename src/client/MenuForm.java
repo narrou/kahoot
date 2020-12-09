@@ -7,30 +7,20 @@ import java.awt.event.ActionListener;
 public class MenuForm extends JPanel {
     private JPanel contentPane;
     private JTextField joinCode;
-    private JTextField JSONfield;
     private JComboBox ComboBoxCat;
     private JButton rejoindrePartieButton;
     private JButton creerPartieButton;
     private JButton ajouterJSONButton;
     private JLabel pseudo;
     private JButton logoutButton;
-    private JLabel erreurlabel;
     private ApplicationClient app ;
 
     public JTextField getJoinCode() {
         return joinCode;
     }
 
-    public JLabel getErreurlabel() {
-        return erreurlabel;
-    }
-
     public JLabel getPseudo() {
         return pseudo;
-    }
-
-    public JTextField getJSONfield() {
-        return JSONfield;
     }
 
     public JComboBox getComboBoxCat() {
