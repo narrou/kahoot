@@ -20,7 +20,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class ApplicationClient extends JFrame {
-    private static int IDPORT=49513;
+    private static int IDPORT=49513; //Port disponnibles des parties
     private LoginForm log ;
     private MenuForm menu;
     private AttenteForm attente;
@@ -41,19 +41,22 @@ public class ApplicationClient extends JFrame {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
+        //Affectation des forms sans oublier de spécifier l'applicationClient qui l'affecte
         log = new LoginForm(this);
         menu = new MenuForm(this);
         attente = new AttenteForm(this);
         jeu = new JeuForm(this);
         finjeu=new tableauScore(this);
-        setContentPane(log.getContentPane());
+        setContentPane(log.getContentPane()); //Récuperation du contenu de log
     }
 
     public void way(String actionCommand){
-
+        //Cette fonction est appelée à chaque appuie sur un bouton,
+        // elle permet de rediriger vers les bonnes commandes a réalisées
         switch (actionCommand) {
 
             case "S'inscrire":
+                //Le code ci dessous permet d'ajouter un nouveau joueur a la bdd
                 if (log.getLogininsc().getText().isEmpty() || log.getMdpinsc().getText().isEmpty()) {
                     log.getInfoLabel().setText("completer les deux champs");
                     this.pack();
@@ -61,15 +64,16 @@ public class ApplicationClient extends JFrame {
                 }
                 Joueur newJoueur = new Joueur(log.getLogininsc().getText(), log.getMdpinsc().getText());
                 try {
-                    provider.addjoueur(newJoueur);
+                    provider.addjoueur(newJoueur);  // On add un joueur si les deux champs sont bien renseignés.
                 } catch (SQLException throwables) {
                     log.getInfoLabel().setText(throwables.getMessage());
                     this.pack();
                 }
-                joueur = newJoueur;
+                joueur = newJoueur; // On sauvegarde le joueur
 
             case "Connexion": case  "Menu" :
-                if (joueur == null) {
+                //On s'occupe de verifié que les champs remplis sont corrects et on sauvegarde le joueur aussi
+                if (joueur == null) { // Cas au l'utilisateur se connecte sans s'inscrire
                     if (log.getLogin().getText().isEmpty() || log.getMdp().getText().isEmpty()) {
                         log.getInfoLabel().setText("completer les deux champs");
                         this.pack();
@@ -83,17 +87,18 @@ public class ApplicationClient extends JFrame {
                     }
                 }
                 menu.getPseudo().setText(joueur.getLogin());
-                updatecombobox(categorieList);
-                setContentPane(menu.getContentPane());
-                this.revalidate();
+                updatecombobox(categorieList); //Afficher les catégories
+                setContentPane(menu.getContentPane()); //Recuperer le contenu de la page menu pour l'afficher
+                this.revalidate(); //Les 2 lignes suivante sont obligatoire pour afficher la nouvelle fenetre
                 this.pack();
                 break;
 
             case "Ajouter JSON":
-                final JFileChooser fc = new JFileChooser();
+                //Add JSON
+                final JFileChooser fc = new JFileChooser(); //Ouvrir une fenetre windows pour choisir un fichier
                 int returnVal = fc.showOpenDialog(this);
                 File file = fc.getSelectedFile();
-                if(returnVal == 0)
+                if(returnVal == 0) //Verifier si le fichier est correcte
                 provider.remplirBdd(file.getAbsolutePath());
                 updatecombobox(categorieList);
                 this.revalidate();
@@ -102,9 +107,9 @@ public class ApplicationClient extends JFrame {
 
             case "Creer partie":
                 serv= new Serveur(IDPORT, this);
-                serv.start();
+                serv.start(); //Demarage du serv avec un port autoincrementé
                 attente.getReadyButton().setVisible(true);
-                try {
+                try { //TODO COMMENTER CETTE PARTIE
                     this.s1 = new Socket(InetAddress.getLocalHost(), IDPORT);
 
                     this.out = new ObjectOutputStream(this.s1.getOutputStream());
@@ -119,25 +124,24 @@ public class ApplicationClient extends JFrame {
                     e.printStackTrace();
                 }
                 IDPORT++;
-                attente.getCatname().setText(menu.getComboBoxCat().getSelectedItem().toString());
+                attente.getCatname().setText(menu.getComboBoxCat().getSelectedItem().toString()); //Afficher la catégorie seletionner dans le combobox
                 attente.getSalleattentlabel().setText("Salle d'attente : "+maPartie.getCodePartie());
-
-
                 setContentPane(attente.getContentPane());
                 this.revalidate();
                 this.pack();
                 break;
             case "Rejoindre partie":
-                String codejoin = menu.getJoinCode().getText();
+                String codejoin = menu.getJoinCode().getText(); //Recuperation du code entré par le joueur
                 try {
-                    ResultSet res = provider.getPartie(codejoin);
+                    ResultSet res = provider.getPartie(codejoin); // Verifié si une partie a ce code
                     if (!res.isBeforeFirst() ) {
                        break;
                     }
                     res.next();
+                   //Sauvegarde de la partie
                     maPartie= new Partie(res.getInt("ID_PARTIE"),res.getString("code"),res.getInt("port"), res.getInt("ID_CATEGORIE"));
                     provider.addJoueurPartie(maPartie.getIdPartie(),joueur.getId());
-                    try {
+                    try { //TODO COMMENTER CETTE PARTIE
                         this.s1 = new Socket("192.168.43.58", res.getInt("port"));
                         this.out = new ObjectOutputStream(this.s1.getOutputStream());
                         this.out.writeObject(joueur);
@@ -157,8 +161,8 @@ public class ApplicationClient extends JFrame {
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
                 }
-
             case  "Logout" :
+                //Se déconnecter + reset des champs
                 joueur =null;
                 log.getInfoLabel().setText("");
                 log.getLogin().setText("");
@@ -170,17 +174,18 @@ public class ApplicationClient extends JFrame {
                 this.pack();
                 break;
 
-
             case  "Ready" :
                 try {
-                    List<Question> ques = provider.getQuestion(maPartie.getIdCategorie());
-                    Collections.shuffle(ques);
+                    List<Question> ques = provider.getQuestion(maPartie.getIdCategorie()); //Get toute les questions de la bdd avec l'id Cat
+                    Collections.shuffle(ques); //Mélange des questions
                     int i = ques.size()-1;
-                    serv.envoyerQuestion(ques.get(i));
+                    serv.envoyerQuestion(ques.get(i)); //Afficher la permière question avant d'attendre 15 sec
                     i--;
+                    //Dans cette partie on crée un Threads qui envoie au serveur les questions toutes les 15 secondes
                     ScheduledThreadPoolExecutor exec = new ScheduledThreadPoolExecutor(1);
                     for (i=i; i>=0;i--) {
-                        jeu.enablebutton(true);
+                        //Décompte des question pour la list
+                        jeu.enablebutton(true); //Activation des boutons
                         int finalI = i;
                         exec.schedule(new Runnable() {
                             public void run() {
@@ -188,7 +193,7 @@ public class ApplicationClient extends JFrame {
                                 try {
                                     Thread.sleep(15000);
                                     if (finalI==0){
-                                        serv.isOver();
+                                        serv.isOver(); //Fin de partie plus de question on envoie a l'écouteur pour informer le serv
                                         serv.fermerSocketEcoute();
                                     }
                                 } catch (InterruptedException e) {
@@ -211,6 +216,7 @@ public class ApplicationClient extends JFrame {
 
         }
     public void updatecombobox(List<Categorie> categorieList){
+        //Remplir le comboBox qui liste les catégories
         menu.getComboBoxCat().removeAllItems();
         try {
             categorieList = provider.getCategories();
@@ -223,6 +229,7 @@ public class ApplicationClient extends JFrame {
     }
 
         public void endgame(){
+        //Fonction de fin de partie (affichage des scores)
             try {
                 tableauScore = provider.getTableauScore(maPartie.getIdPartie());
                 for(int i=0; tableauScore.size()!=i;i++)
@@ -236,6 +243,7 @@ public class ApplicationClient extends JFrame {
         }
 
     public void afficherQuestion(Question q) throws SQLException {
+        //Remplissage du jeu avec les questions, le nom du joueur, le timer, les reponses et la bonne reponse cachée
         jeu.getNomJoueur().setText(joueur.getLogin());
         jeu.getCategorie().setText(q.getCategorie().getCategorie());
         jeu.getQuestion().setText(q.getTexteOption());
@@ -251,7 +259,7 @@ public class ApplicationClient extends JFrame {
 
         int i = 14;
         ScheduledThreadPoolExecutor exec = new ScheduledThreadPoolExecutor(1);
-
+        //Threads Décompte du timer toutes les 1secondes
         for (i=i; i!=0;i--) {
             jeu.enablebutton(true);
             int finalI = i;
@@ -271,7 +279,7 @@ public class ApplicationClient extends JFrame {
 
     public boolean validation(String choix)
     {
-
+    //vérification que le bouton reponse appuyer est le bon (ou non) + 1pt en plus dans la bdd si bonne réponse
         if (choix.equals(jeu.getBonneReponse().getText())) {
             try {
                 provider.setScore(joueur.getId(),maPartie.getIdPartie());
@@ -295,6 +303,7 @@ public class ApplicationClient extends JFrame {
     }
 
     public static void main(String[] args) {
+        //Création des joueurs
         ApplicationClient f = new ApplicationClient();
         f.setVisible(true);
         f.pack();

@@ -14,6 +14,7 @@ public class tableauScore extends JDialog {
     public tableauScore(ApplicationClient app) {
         this.app = app;
         Connexion.addActionListener(new ActionListener() {
+            //Appel de la fonction de redirection
             public void actionPerformed(ActionEvent e) {
                 app.way(e.getActionCommand());
             }

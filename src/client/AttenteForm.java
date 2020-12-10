@@ -27,6 +27,7 @@ public class AttenteForm extends JPanel {
     public AttenteForm(ApplicationClient application) {
         app=application;
         readyButton.addActionListener(new ActionListener() {
+            //Appel de la fonction de redirection
             public void actionPerformed(ActionEvent e) {
                 app.way(e.getActionCommand());
             }

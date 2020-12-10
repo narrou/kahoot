@@ -30,6 +30,7 @@ public class MenuForm extends JPanel {
     public  MenuForm(ApplicationClient application) {
         app=application;
         rejoindrePartieButton.addActionListener(new ActionListener() {
+            //Appel de la fonction de redirection
             public void actionPerformed(ActionEvent e) {
                 app.way(e.getActionCommand());
             }

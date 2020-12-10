@@ -23,7 +23,6 @@ public class JeuForm extends JDialog {
     private JLabel bonneReponse;
     private JLabel toStringBonneRep;
     private JLabel score;
-    private JLabel toStringScore;
     private JLabel nomJoueur;
     private ApplicationClient app;
 
@@ -31,10 +30,10 @@ public class JeuForm extends JDialog {
         this.app = app;
         aButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-               boolean v=  app.validation(getRepA().getText());
-                if (v)
+               boolean v=  app.validation(getRepA().getText()); //Vérification de la réponse
+                if (v) //Si true bouton vert
                     aButton.setBackground(Color.green);
-                else
+                else //Si false bouton rouge
                     aButton.setBackground(Color.red);
                 enablebutton(false);
             }
@@ -72,13 +71,14 @@ public class JeuForm extends JDialog {
     }
 
     public void enablebutton(boolean b){
-        toStringBonneRep.setVisible(!b);
+        //Désactive tous les boutons après avoir répondu à la question
+        toStringBonneRep.setVisible(!b); //Affichage de la bonne réponse
         bonneReponse.setVisible(!b);
         aButton.setEnabled(b);
         bButton.setEnabled(b);
         cButton.setEnabled(b);
         dButton.setEnabled(b);
-        if (b){
+        if (b){ //reset des bouton si (b==true)
             aButton.setBackground(null);
             bButton.setBackground(null);
             cButton.setBackground(null);

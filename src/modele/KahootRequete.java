@@ -13,6 +13,10 @@ import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.*;
 
+
+//CETTE CLASSE CONTIENT TOUTES LES FONCTIONS QUI REQUETE LA BDD
+
+
 public class KahootRequete {
     private static Scanner scanner = new Scanner(System.in);
     private static Connection connect;

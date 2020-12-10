@@ -39,6 +39,7 @@ public class LoginForm extends JPanel {
     public  LoginForm(ApplicationClient application) {
         app=application;
         sInscrireButton.addActionListener(new ActionListener() {
+            //Appel de la fonction de redirection
             public void actionPerformed(ActionEvent e) {
                app.way(e.getActionCommand());
             }

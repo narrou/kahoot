@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.sql.SQLException;
 
+
+//TODO A COMMENTER
 public class Ecouteur extends Thread {
     private ObjectInputStream in;
     private ApplicationClient app;
