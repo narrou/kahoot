@@ -4,20 +4,16 @@ import modele.Joueur;
 import modele.ListeJoueur;
 import modele.Question;
 
-import javax.swing.*;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.sql.SQLException;
 
-
-//TODO A COMMENTER
 public class Ecouteur extends Thread {
     private ObjectInputStream in;
     private ApplicationClient app;
 
     public Ecouteur(ObjectInputStream in, ApplicationClient app) {
-
+        // On recupere l'input stream de la connexion et la fenêtre
         this.in = in;
         this.app = app;
     }
@@ -25,8 +21,11 @@ public class Ecouteur extends Thread {
     public void run() {
         try {
             while (true) {
+                // On a trois états dans une partie
+
                 String verif =(String) in.readObject();
                 if (verif.equals("NotReady")) {
+                    // NotReady est la liste d'attente
                     ListeJoueur txt = (ListeJoueur) in.readObject();
                     if (txt != null) {
                         app.getAttente().getListeJoueur().setText("");
@@ -38,6 +37,7 @@ public class Ecouteur extends Thread {
                     }
                 }
                 else if (verif.equals("Ready")) {
+                    // Ready est le jeu avec l'envoi des questions
                     app.setContentPane(app.getJeu().getContentPane());
                     app.revalidate();
                     app.setSize(700,500);
@@ -46,6 +46,7 @@ public class Ecouteur extends Thread {
 
                 }
                 else if (verif.equals("Over")) {
+                    // Over termine la partie
                     app.endgame();
                 }
 

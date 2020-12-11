@@ -1,7 +1,5 @@
 package client;
 
-import modele.Question;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;

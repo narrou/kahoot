@@ -8,7 +8,6 @@ import modele.Question;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -46,6 +45,7 @@ public class Serveur extends Thread{
     }
 
     private void envoyerMessages(){
+        // On envoie la liste des joueurs à toutes les connexions
         for (Connexion c : connexions){
             try {
                 ObjectOutputStream oos = c.getOut();
@@ -59,6 +59,7 @@ public class Serveur extends Thread{
     }
 
     public void isOver(){
+        // On envoie fin de partie à toutes les connexions
         for (Connexion c : connexions){
             try {
                 ObjectOutputStream oos = c.getOut();
@@ -73,6 +74,7 @@ public class Serveur extends Thread{
 
 
     public void envoyerQuestion(Question q){
+        // On envoie une connexions à toutes les connexions
         for (Connexion c : connexions){
             try {
                 ObjectOutputStream oos = c.getOut();
@@ -91,9 +93,11 @@ public class Serveur extends Thread{
     public void run(){
         try {
             do {
+                // On attend une connexion à tout moment de la parte, ca permet de rejoindre une partie en cours
                 System.out.println("En attente de connexion");
                 Socket co = this.socEcoute.accept();
                 System.out.println("Connexion acceptée");
+
                 ObjectOutputStream oos = new ObjectOutputStream(co.getOutputStream());
                 ObjectInputStream ois = new ObjectInputStream(co.getInputStream());
                 Joueur j = (Joueur) ois.readObject();
@@ -102,6 +106,7 @@ public class Serveur extends Thread{
                 connexions.add(c);
                 connexions.get(connexions.size()-1).start();
                 envoyerMessages();
+
                 System.out.println("Connexion démarrée");
                 System.out.println(connexions.size());
             }while (true);

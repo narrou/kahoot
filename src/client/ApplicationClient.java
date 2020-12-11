@@ -1,9 +1,6 @@
 package client;
 import modele.*;
-import serveur.Connexion;
 import serveur.Serveur;
-
-//TODO GERER LES SQL EXECPTION
 
 
 import javax.swing.*;
@@ -13,7 +10,6 @@ import java.net.Socket;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -109,17 +105,20 @@ public class ApplicationClient extends JFrame {
                 serv= new Serveur(IDPORT, this);
                 serv.start(); //Demarage du serv avec un port autoincrementé
                 attente.getReadyButton().setVisible(true);
-                try { //TODO COMMENTER CETTE PARTIE
+                try {
+                    // On crée une connexion
                     this.s1 = new Socket(InetAddress.getLocalHost(), IDPORT);
 
                     this.out = new ObjectOutputStream(this.s1.getOutputStream());
                     this.out.writeObject(joueur);
+                    // On envoie un objet joueur à toutes les connexions
                     Ecouteur ec = new Ecouteur(new ObjectInputStream(this.s1.getInputStream()), this);
                     ec.start();
                     Categorie c = (Categorie) menu.getComboBoxCat().getSelectedItem();
 
                     maPartie= provider.addPartie(joueur,IDPORT, c.getIdCat());
                     provider.addJoueurPartie(maPartie.getIdPartie(),joueur.getId());
+                    // On ajoute dans la BDD la partie
                 } catch (IOException | SQLException e) {
                     e.printStackTrace();
                 }
@@ -141,8 +140,9 @@ public class ApplicationClient extends JFrame {
                    //Sauvegarde de la partie
                     maPartie= new Partie(res.getInt("ID_PARTIE"),res.getString("code"),res.getInt("port"), res.getInt("ID_CATEGORIE"));
                     provider.addJoueurPartie(maPartie.getIdPartie(),joueur.getId());
-                    try { //TODO COMMENTER CETTE PARTIE
-                        this.s1 = new Socket("192.168.43.58", res.getInt("port"));
+                    try {
+                        // On crée une connexion
+                        this.s1 = new Socket(InetAddress.getLocalHost(), res.getInt("port"));
                         this.out = new ObjectOutputStream(this.s1.getOutputStream());
                         this.out.writeObject(joueur);
                         Ecouteur ec = new Ecouteur(new ObjectInputStream(this.s1.getInputStream()), this);
@@ -151,6 +151,7 @@ public class ApplicationClient extends JFrame {
                         attente.getCatname().setText(provider.getCategorie(maPartie.getIdCategorie()));
                         attente.getSalleattentlabel().setText("Salle d'attente : "+maPartie.getCodePartie());
                         attente.getReadyButton().setVisible(false);
+                        // On ne montre le bouton ready qu'a l'hote
                         this.revalidate();
                         this.pack();
                         break;

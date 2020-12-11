@@ -2,11 +2,8 @@ package serveur;
 
 import client.ApplicationClient;
 import modele.Joueur;
-import modele.ListeJoueur;
-import modele.Message;
 import java.io.*;
 import java.net.Socket;
-import java.util.List;
 
 public class Connexion extends Thread{
     private Socket socket;
